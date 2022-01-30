@@ -1,11 +1,11 @@
 package bstmap;
 
-import java.util.HashMap;
-import java.util.TreeMap;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Scanner;
+import java.util.TreeMap;
 
-import edu.princeton.cs.algs4.Stopwatch;
+// import edu.princeton.cs.algs4.Stopwatch;
 
 /**
  * Performs a timing test on three different set implementations.

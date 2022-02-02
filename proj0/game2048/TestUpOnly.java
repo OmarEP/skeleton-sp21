@@ -2,9 +2,8 @@ package game2048;
 
 import org.junit.Test;
 
-import static org.junit.Assert.*;
-
-/** Tests the tilt() method in the up (Side.NORTH) direction only.
+/**
+ * Tests the tilt() method in the up (Side.NORTH) direction only.
  *
  * @author Omar Khan
  */
@@ -14,13 +13,13 @@ public class TestUpOnly extends TestUtils {
     @Test
     /** Move tiles up (no merging). */
     public void testUpNoMerge() {
-        int[][] before = new int[][] {
+        int[][] before = new int[][]{
                 {0, 0, 4, 0},
                 {0, 0, 0, 2},
                 {0, 0, 0, 0},
                 {0, 0, 0, 0},
         };
-        int[][] after = new int[][] {
+        int[][] after = new int[][]{
                 {0, 0, 4, 2},
                 {0, 0, 0, 0},
                 {0, 0, 0, 0},
@@ -37,13 +36,13 @@ public class TestUpOnly extends TestUtils {
     @Test
     /** A basic merge. */
     public void testUpBasicMerge() {
-        int[][] before = new int[][] {
+        int[][] before = new int[][]{
                 {0, 0, 0, 0},
                 {0, 0, 2, 0},
                 {0, 0, 2, 0},
                 {0, 0, 0, 0},
         };
-        int[][] after = new int[][] {
+        int[][] after = new int[][]{
                 {0, 0, 4, 0},
                 {0, 0, 0, 0},
                 {0, 0, 0, 0},
@@ -60,13 +59,13 @@ public class TestUpOnly extends TestUtils {
     @Test
     /** A triple merge. Only the leading 2 tiles should merge. */
     public void testUpTripleMerge() {
-        int[][] before = new int[][] {
+        int[][] before = new int[][]{
                 {0, 0, 2, 0},
                 {0, 0, 0, 0},
                 {0, 0, 2, 0},
                 {0, 0, 2, 0},
         };
-        int[][] after = new int[][] {
+        int[][] after = new int[][]{
                 {0, 0, 4, 0},
                 {0, 0, 2, 0},
                 {0, 0, 0, 0},
@@ -88,13 +87,13 @@ public class TestUpOnly extends TestUtils {
      * this test, try seeing how you can ensure that the bottom 4 tile doesn't
      * merge with the newly created 4 tile on top.*/
     public void testUpTrickyMerge() {
-        int[][] before = new int[][] {
+        int[][] before = new int[][]{
                 {0, 0, 2, 0},
                 {0, 0, 2, 0},
                 {0, 0, 0, 0},
                 {0, 0, 4, 0},
         };
-        int[][] after = new int[][] {
+        int[][] after = new int[][]{
                 {0, 0, 4, 0},
                 {0, 0, 4, 0},
                 {0, 0, 0, 0},
@@ -106,5 +105,53 @@ public class TestUpOnly extends TestUtils {
         boolean changed = model.tilt(Side.NORTH);
         checkChanged(Side.NORTH, true, changed);
         checkModel(after, 4, 0, prevBoard, Side.NORTH);
+    }
+
+    @Test
+    /** Making sure tiles don't jump other tiles if the other end of the tile shares the same number*/
+    public void testTileInBetween() {
+        int[][] before = new int[][]{
+                {0, 0, 4, 0},
+                {0, 0, 2, 0},
+                {0, 0, 0, 0},
+                {0, 0, 4, 0},
+        };
+        int[][] after = new int[][]{
+                {0, 0, 4, 0},
+                {0, 0, 2, 0},
+                {0, 0, 4, 0},
+                {0, 0, 0, 0},
+        };
+
+        updateModel(before, 0, 0, false);
+        String prevBoard = model.toString();
+        boolean changed = model.tilt(Side.NORTH);
+        checkChanged(Side.NORTH, true, changed);
+        checkModel(after, 0, 0, prevBoard, Side.NORTH);
+    }
+
+    @Test
+    /**
+     * Tilt() example shown in the project specs.
+     */
+    public void testTiltExample() {
+        int[][] before = new int[][]{
+                {2, 0, 2, 0},
+                {4, 4, 2, 2},
+                {0, 4, 0, 0},
+                {2, 4, 4, 8},
+        };
+        int[][] after = new int[][]{
+                {2, 8, 4, 2},
+                {4, 4, 4, 8},
+                {2, 0, 0, 0},
+                {0, 0, 0, 0},
+        };
+
+        updateModel(before, 0, 0, false);
+        String prevBoard = model.toString();
+        boolean changed = model.tilt(Side.NORTH);
+        checkChanged(Side.NORTH, true, changed);
+        checkModel(after, 12, 0, prevBoard, Side.NORTH);
     }
 }

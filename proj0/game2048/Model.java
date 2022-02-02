@@ -140,15 +140,74 @@ public class Model extends Observable {
         boolean changed;
         changed = false;
 
+        boolean[][] prevMerge = new boolean[][]{
+                {false, false, false, false},
+                {false, false, false, false},
+                {false, false, false, false},
+                {false, false, false, false}
+        };
+
         // TODO: Modify this.board (and perhaps this.score) to account
         // for the tilt to the Side SIDE. If the board changed, set the
         // changed local variable to true.
+        this.board.setViewingPerspective(side);
+        for (int j = 0; j < this.board.size(); j++) {
+            for (int i = this.board.size() - 1; i >= 0; i--) {
+                if (tile(j, i) != null) {
+                    int units = -1;
+                    for (int k = board.size() - 1; k > 0; k--) {
+                        if (validMove(board, j, i + k) && (board.tile(j, i + k) == null || board.tile(j, i + k).value() == board.tile(j, i).value())
+                                && !prevMerge[j][i + k] && !tilesInBetween(board, tile(j, i), board.tile(j, i + k))) {
+                            units = k;
+                            break;
+                        }
+                    }
+                    if (units > 0) {
+                        boolean merged = this.board.move(j, i + units, this.tile(j, i));
+                        if (merged) {
+                            prevMerge[j][i + units] = true;
+                            this.score += this.board.tile(j, i + units).value();
+                        }
+                        changed = true;
+                    }
+                }
+            }
+        }
+        this.board.setViewingPerspective(Side.NORTH);
 
         checkGameOver();
         if (changed) {
             setChanged();
         }
         return changed;
+    }
+
+
+//    private int moveDistance(Board b, Tile tile, boolean[][] prevMerge) {
+//        for (int i = b.size() - 1; i > 0; i--) {
+//            if (validMove(b, tile.col(), tile.row() + i) && (b.tile(tile.col(), tile.row() + i) == null || b.tile(tile.col(), tile.row() + i).value() == tile.value())
+//                    && !prevMerge[tile.col()][tile.row() + i] && !tilesInBetween(b, tile, b.tile(tile.col(), tile.row() + i))) {
+//                return i;
+//            }
+//        }
+//
+//        return -1;
+//    }
+
+    private boolean isTileNull(Tile tile) {
+        return tile == null;
+    }
+
+    private boolean tilesInBetween(Board b, Tile tile, Tile destination) {
+        if (destination == null) {
+            return false;
+        }
+        for (int i = tile.row() + 1; i < destination.row(); i++) {
+            if (b.tile(tile.col(), i) != null) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**

@@ -194,9 +194,9 @@ public class Model extends Observable {
 //        return -1;
 //    }
 
-    private boolean isTileNull(Tile tile) {
-        return tile == null;
-    }
+//    private boolean isTileNull(Tile tile) {
+//        return tile == null;
+//    }
 
     private boolean tilesInBetween(Board b, Tile tile, Tile destination) {
         if (destination == null) {

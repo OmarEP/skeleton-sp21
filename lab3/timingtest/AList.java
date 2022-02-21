@@ -69,7 +69,7 @@ public class AList<Item> {
     public int size() {
         return size;
     }
-
+    
     /**
      * Deletes item from back of the list and
      * returns deleted item.

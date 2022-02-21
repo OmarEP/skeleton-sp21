@@ -1,24 +1,20 @@
-public class Dog {
-    public int weightInPounds;
-
-    public Dog(int w) {
-        this.weightInPounds = w;
+public class Dog implements Animal {
+    @Override
+    public void sniff(Animal a) {
+        System.out.println("dog sniff animal");
     }
 
-    public void makeNoise() {
-        if (weightInPounds < 10) {
-            System.out.println("yip!");
-        } else if (weightInPounds < 30) {
-            System.out.println("bark.");
-        } else {
-            System.out.println("woooof!");
-        }
+    
+    public void praise(Dog a) {
+        System.out.println("u r cool dog");
     }
 
-    public static Dog maxDog(Dog d1, Dog d2) {
-        if (d1.weightInPounds > d2.weightInPounds) {
-            return d1;
-        }
-        return d2;
+    public static void main(String[] args) {
+        Animal a = new Dog();
+        Dog d = new Dog();
+        a.greet(d);
+        a.sniff(d);
+        d.praise(d);
+        a.praise(d);
     }
 }

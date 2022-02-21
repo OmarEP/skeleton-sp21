@@ -71,16 +71,25 @@ public class ArrayDeque<T> implements Deque<T> {
     }
 
     public T removeFirst() {
+        if (isEmpty()) {
+            return null;
+        }
+        this.size--;
+
         T node = this.items[firstIndex];
         this.items[firstIndex] = null;
         firstIndex = (firstIndex + 1) % this.items.length;
         nextFirstIndex = (nextFirstIndex + 1) % this.items.length;
-        this.size--;
 
         return node;
     }
 
     public T removeLast() {
+        if (isEmpty()) {
+            return null;
+        }
+        this.size--;
+
         T node = this.items[lastIndex];
         this.items[lastIndex] = null;
         lastIndex -= 1;
@@ -95,7 +104,7 @@ public class ArrayDeque<T> implements Deque<T> {
     }
 
     public T get(int index) {
-        if (index >= this.size()) {
+        if (index < 0 || index >= this.size()) {
             return null;
         }
         return this.items[index];

@@ -5,16 +5,13 @@ public class ArrayDeque<T> implements Deque<T> {
     private int size;
     private int firstIndex;
     private int lastIndex;
-    private int nextFirstIndex;
-    private int nextLastIndex;
+
 
     public ArrayDeque() {
         this.items = (T[]) new Object[8];
         this.size = 0;
-        this.nextFirstIndex = 4;
-        this.firstIndex = nextFirstIndex;
-        this.nextLastIndex = 5;
-        this.lastIndex = nextLastIndex;
+        this.firstIndex = 4;
+        this.lastIndex = 5;
     }
 
     private void resize(int capacity) {
@@ -25,25 +22,33 @@ public class ArrayDeque<T> implements Deque<T> {
 
     public void addFirst(T item) {
         this.size++;
-        if (this.size() == this.items.length) {
-            resize(this.size() * 2);
+//        if (this.size() == this.items.length) {
+//            resize(this.size() * 2);
+//        }
+        this.items[firstIndex] = item;
+        firstIndex = minusOne(firstIndex);
+    }
+
+    private int minusOne(int index) {
+        index -= 1;
+        if (index < 0) {
+            index = this.items.length - 1;
         }
-        this.items[nextFirstIndex] = item;
-        firstIndex = nextFirstIndex;
-        nextFirstIndex -= 1;
-        if (nextFirstIndex < 0) {
-            nextFirstIndex = this.items.length - 1;
-        }
+        return index;
     }
 
     public void addLast(T item) {
         this.size++;
-        if (this.size() == this.items.length) {
-            resize(this.size() * 2);
-        }
-        this.items[nextLastIndex] = item;
-        this.lastIndex = nextLastIndex;
-        this.nextLastIndex = (this.nextLastIndex + 1) % this.items.length;
+//        if (this.size() == this.items.length) {
+//            resize(this.size() * 2);
+//        }
+        this.items[lastIndex] = item;
+        this.lastIndex = plusOne(lastIndex);
+    }
+
+    private int plusOne(int index) {
+        index = (index + 1) % this.items.length;
+        return index;
     }
 
     public boolean isEmpty() {
@@ -55,9 +60,14 @@ public class ArrayDeque<T> implements Deque<T> {
     }
 
     public void printDeque() {
+        if (isEmpty()) {
+            return;
+        }
 
-        for (int i = firstIndex; ; ) {
-            if (i == lastIndex) {
+        int first = plusOne(firstIndex);
+        int last = minusOne(lastIndex);
+        for (int i = first; ; ) {
+            if (i == last) {
                 if (this.items[i] == null) {
                     break;
                 }
@@ -76,10 +86,12 @@ public class ArrayDeque<T> implements Deque<T> {
         }
         this.size--;
 
+        if (this.items[firstIndex] == null) {
+            firstIndex = plusOne(firstIndex);
+        }
+
         T node = this.items[firstIndex];
         this.items[firstIndex] = null;
-        firstIndex = (firstIndex + 1) % this.items.length;
-        nextFirstIndex = (nextFirstIndex + 1) % this.items.length;
 
         return node;
     }
@@ -90,16 +102,12 @@ public class ArrayDeque<T> implements Deque<T> {
         }
         this.size--;
 
+        if (this.items[lastIndex] == null) {
+            lastIndex = minusOne(lastIndex);
+        }
         T node = this.items[lastIndex];
         this.items[lastIndex] = null;
-        lastIndex -= 1;
-        if (lastIndex < 0) {
-            lastIndex = this.items.length - 1;
-        }
-        nextLastIndex -= 1;
-        if (nextLastIndex < 0) {
-            nextLastIndex = this.items.length - 1;
-        }
+
         return node;
     }
 
@@ -107,7 +115,7 @@ public class ArrayDeque<T> implements Deque<T> {
         if (index < 0 || index >= this.size()) {
             return null;
         }
-        return this.items[index];
+        return this.items[(index + firstIndex + 1) % this.items.length];
     }
 
     public static void main(String[] args) {
@@ -119,10 +127,31 @@ public class ArrayDeque<T> implements Deque<T> {
         arrayDeque.addLast("e");
         arrayDeque.addFirst("f");
 
-        arrayDeque.removeFirst();
-        arrayDeque.removeLast();
-        arrayDeque.removeLast();
-        arrayDeque.removeFirst();
+//        arrayDeque.addFirst("a");
+//        arrayDeque.addFirst("b");
+//        arrayDeque.addFirst("c");
+//        arrayDeque.addFirst("d");
+//        arrayDeque.addFirst("e");
+//        arrayDeque.addFirst("f");
+//        arrayDeque.addFirst("h");
+//        arrayDeque.addFirst("g");
+
+//        System.out.println(arrayDeque.get(0));
+//        System.out.println(arrayDeque.get(5));
+//        System.out.println(arrayDeque.get(2));
+//        System.out.println(arrayDeque.get(5));
+
+//        arrayDeque.addFirst("a");
+//        arrayDeque.addFirst("b");
+//
+//        arrayDeque.removeLast();
+//        arrayDeque.removeLast();
+//        arrayDeque.removeLast();
+
+//        arrayDeque.removeFirst();
+//        arrayDeque.removeLast();
+//        arrayDeque.removeLast();
+//        arrayDeque.removeFirst();
 
         arrayDeque.printDeque();
     }

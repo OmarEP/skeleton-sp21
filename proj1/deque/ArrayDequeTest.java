@@ -107,6 +107,94 @@ public class ArrayDequeTest {
 
     }
 
+    @Test
+    public void emptyFillUpAgain() {
+
+        ArrayDeque<String> arrayDeque = new ArrayDeque<>();
+        arrayDeque.addFirst("a");
+        arrayDeque.addFirst("b");
+        arrayDeque.addFirst("c");
+        arrayDeque.addFirst("d");
+        arrayDeque.addFirst("e");
+        arrayDeque.addFirst("f");
+        arrayDeque.addFirst("h");
+        arrayDeque.addFirst("g");
+
+        arrayDeque.removeFirst();
+        arrayDeque.removeFirst();
+        arrayDeque.removeFirst();
+        arrayDeque.removeFirst();
+        arrayDeque.removeFirst();
+        arrayDeque.removeFirst();
+        arrayDeque.removeFirst();
+        arrayDeque.removeFirst();
+
+        arrayDeque.addFirst("a");
+        arrayDeque.addFirst("b");
+        arrayDeque.addFirst("c");
+        arrayDeque.addFirst("d");
+        arrayDeque.addFirst("e");
+        arrayDeque.addFirst("f");
+        arrayDeque.addFirst("h");
+        arrayDeque.addFirst("g");
+
+        arrayDeque.removeFirst();
+        arrayDeque.removeFirst();
+        arrayDeque.removeFirst();
+        arrayDeque.removeFirst();
+        arrayDeque.removeFirst();
+        arrayDeque.removeFirst();
+        arrayDeque.removeFirst();
+        arrayDeque.removeFirst();
+
+        arrayDeque.addFirst("a");
+        arrayDeque.addFirst("b");
+        arrayDeque.addFirst("c");
+        arrayDeque.addFirst("d");
+        arrayDeque.addFirst("e");
+        arrayDeque.addFirst("f");
+        arrayDeque.addFirst("h");
+        arrayDeque.addFirst("g");
+
+        arrayDeque.removeLast();
+        arrayDeque.removeLast();
+        arrayDeque.removeLast();
+        arrayDeque.removeLast();
+        arrayDeque.removeLast();
+        arrayDeque.removeLast();
+        arrayDeque.removeLast();
+        arrayDeque.removeLast();
+
+        arrayDeque.addLast("a");
+        arrayDeque.addLast("b");
+        arrayDeque.addLast("c");
+        arrayDeque.addLast("d");
+        arrayDeque.addLast("e");
+        arrayDeque.addLast("f");
+        arrayDeque.addLast("g");
+        arrayDeque.addLast("h");
+
+        arrayDeque.removeLast();
+        arrayDeque.removeLast();
+        arrayDeque.removeLast();
+        arrayDeque.removeLast();
+        arrayDeque.removeLast();
+        arrayDeque.removeLast();
+        arrayDeque.removeLast();
+        arrayDeque.removeLast();
+
+        arrayDeque.addLast("a");
+        arrayDeque.addLast("b");
+        arrayDeque.addLast("c");
+        arrayDeque.addLast("d");
+        arrayDeque.addLast("e");
+        arrayDeque.addLast("f");
+        arrayDeque.addLast("g");
+        arrayDeque.addLast("h");
+        
+        assertEquals(8, arrayDeque.size());
+    }
+
     // Randomized test for ArrayDeque
     @Test
     public void randomizedTest() {

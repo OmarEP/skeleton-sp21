@@ -86,10 +86,7 @@ public class ArrayDeque<T> implements Deque<T> {
         }
         this.size--;
 
-        if (this.items[firstIndex] == null) {
-            firstIndex = plusOne(firstIndex);
-        }
-
+        firstIndex = plusOne(firstIndex);
         T node = this.items[firstIndex];
         this.items[firstIndex] = null;
 
@@ -102,9 +99,7 @@ public class ArrayDeque<T> implements Deque<T> {
         }
         this.size--;
 
-        if (this.items[lastIndex] == null) {
-            lastIndex = minusOne(lastIndex);
-        }
+        lastIndex = minusOne(lastIndex);
         T node = this.items[lastIndex];
         this.items[lastIndex] = null;
 
@@ -126,32 +121,45 @@ public class ArrayDeque<T> implements Deque<T> {
         arrayDeque.addLast("d");
         arrayDeque.addLast("e");
         arrayDeque.addFirst("f");
+        arrayDeque.addLast("g");
+        arrayDeque.addFirst("h");
 
-//        arrayDeque.addFirst("a");
-//        arrayDeque.addFirst("b");
-//        arrayDeque.addFirst("c");
-//        arrayDeque.addFirst("d");
-//        arrayDeque.addFirst("e");
-//        arrayDeque.addFirst("f");
-//        arrayDeque.addFirst("h");
-//        arrayDeque.addFirst("g");
 
-//        System.out.println(arrayDeque.get(0));
-//        System.out.println(arrayDeque.get(5));
-//        System.out.println(arrayDeque.get(2));
-//        System.out.println(arrayDeque.get(5));
+        arrayDeque.removeLast();
+        arrayDeque.removeLast();
+        arrayDeque.removeLast();
+        arrayDeque.removeFirst();
+        arrayDeque.removeFirst();
+        arrayDeque.removeLast();
+        arrayDeque.removeLast();
+        arrayDeque.removeFirst();
 
-//        arrayDeque.addFirst("a");
-//        arrayDeque.addFirst("b");
-//
-//        arrayDeque.removeLast();
-//        arrayDeque.removeLast();
-//        arrayDeque.removeLast();
+        arrayDeque.addLast("a");
+        arrayDeque.addLast("b");
+        arrayDeque.addFirst("c");
+        arrayDeque.addLast("d");
+        arrayDeque.addLast("e");
+        arrayDeque.addFirst("f");
+        arrayDeque.addLast("g");
+        arrayDeque.addFirst("h");
 
-//        arrayDeque.removeFirst();
-//        arrayDeque.removeLast();
-//        arrayDeque.removeLast();
-//        arrayDeque.removeFirst();
+        arrayDeque.removeLast();
+        arrayDeque.removeLast();
+        arrayDeque.removeLast();
+        arrayDeque.removeFirst();
+        arrayDeque.removeFirst();
+        arrayDeque.removeLast();
+        arrayDeque.removeLast();
+        arrayDeque.removeFirst();
+
+        arrayDeque.addLast("a");
+        arrayDeque.addLast("b");
+        arrayDeque.addFirst("c");
+        arrayDeque.addLast("d");
+        arrayDeque.addLast("e");
+        arrayDeque.addFirst("f");
+        arrayDeque.addLast("g");
+        arrayDeque.addFirst("h");
 
         arrayDeque.printDeque();
     }

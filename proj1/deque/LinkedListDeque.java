@@ -27,7 +27,7 @@ public class LinkedListDeque<T> implements Deque<T>, Iterable<T> {
     }
 
     public LinkedListDeque(T item) {
-        this.sentinel = new Node(null, null, null);
+        this.sentinel = new Node(this.sentinel, null, this.sentinel);
         this.sentinel.next = new Node(this.sentinel, item, this.sentinel);
         this.sentinel.prev = this.sentinel.next;
         this.size = 1;
@@ -50,7 +50,7 @@ public class LinkedListDeque<T> implements Deque<T>, Iterable<T> {
     @Override
     public void addLast(T item) {
         if (this.isEmpty()) {
-            Node n = new Node(this.sentinel, item, this.sentinel.next);
+            Node n = new Node(this.sentinel, item, this.sentinel);
             this.sentinel.next = n;
             this.sentinel.prev = n;
         } else {
@@ -98,11 +98,15 @@ public class LinkedListDeque<T> implements Deque<T>, Iterable<T> {
         }
 
         Node n = this.sentinel.next;
-        this.sentinel.next = this.sentinel.next.next;
-        this.sentinel.next.prev = this.sentinel;
+        this.sentinel.next = getNext().next;
+        getNext().prev = this.sentinel;
         this.size--;
 
         return n.item;
+    }
+
+    private Node getNext() {
+        return this.sentinel.next;
     }
 
     @Override
@@ -112,11 +116,15 @@ public class LinkedListDeque<T> implements Deque<T>, Iterable<T> {
         }
 
         Node n = this.sentinel.prev;
-        this.sentinel.prev = this.sentinel.prev.prev;
-        this.sentinel.prev.next = this.sentinel;
+        this.sentinel.prev = getPrev().prev;
+        getPrev().next = this.sentinel;
         this.size--;
 
         return n.item;
+    }
+
+    private Node getPrev() {
+        return this.sentinel.prev;
     }
 
     @Override

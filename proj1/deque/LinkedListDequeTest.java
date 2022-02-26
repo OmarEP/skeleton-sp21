@@ -132,31 +132,6 @@ public class LinkedListDequeTest {
 
     }
 
-    @Test
-    public void linkedListDequeToStringTest() {
-        String expected = "{s, q, n, h, f, c, a, b, d, e, g, l, m, o, p, r}";
-        LinkedListDeque<String> list1 = new LinkedListDeque<>();
-
-        list1.addLast("a");
-        list1.addLast("b");
-        list1.addFirst("c");
-        list1.addLast("d");
-        list1.addLast("e");
-        list1.addFirst("f");
-        list1.addLast("g");
-        list1.addFirst("h");
-
-        list1.addLast("l");
-        list1.addLast("m");
-        list1.addFirst("n");
-        list1.addLast("o");
-        list1.addLast("p");
-        list1.addFirst("q");
-        list1.addLast("r");
-        list1.addFirst("s");
-
-        assertEquals(expected, list1.toString());
-    }
 
     @Test
     public void linkedListDequeEqualsTest() {
@@ -302,13 +277,29 @@ public class LinkedListDequeTest {
         assertEquals(8, linkedList.size());
     }
 
+    @Test
+    public void addLastTest() {
+        LinkedListDeque<Integer> linkedList = new LinkedListDeque<>();
+        linkedList.addLast(46);
+        linkedList.removeLast();
+        linkedList.addLast(45);
+        linkedList.addLast(60);
+        linkedList.addFirst(25);
+        linkedList.removeFirst();
+        linkedList.removeLast();
+        linkedList.removeLast();
+        linkedList.removeFirst();
+
+        assertEquals(0, linkedList.size());
+    }
+
     // Randomized test for ArrayDeque
     @Test
     public void randomizedTest() {
         ArrayList<Integer> buggyAList = new ArrayList<>();
         LinkedListDeque<Integer> ll = new LinkedListDeque<>();
 
-        int N = 100000;
+        int N = 1000000;
         for (int i = 0; i < N; i += 1) {
             int operationNumber = StdRandom.uniform(0, 7);
             if (operationNumber == 0) {
@@ -316,11 +307,13 @@ public class LinkedListDequeTest {
                 int randVal = StdRandom.uniform(0, 100);
                 buggyAList.add(randVal);
                 ll.addLast(randVal);
+                System.out.println(operationNumber);
             } else if (operationNumber == 1) {
                 // size
                 int buggyArraySize = buggyAList.size();
                 int llSize = ll.size();
                 assertEquals(buggyArraySize, llSize);
+                System.out.println(operationNumber);
             } else if (operationNumber == 2) {
                 int randVal = StdRandom.uniform(0, 100);
                 buggyAList.add(0, randVal);
@@ -330,20 +323,24 @@ public class LinkedListDequeTest {
             } else if (operationNumber == 3) {
                 int buggyAFirstRemoved = buggyAList.remove(0);
                 int llFirstRemoved = ll.removeFirst();
+                System.out.println(operationNumber);
                 assertEquals(buggyAFirstRemoved, llFirstRemoved);
             } else if (operationNumber == 4) {
                 int buggyALastRemoved = buggyAList.remove(buggyAList.size() - 1);
                 int llLastRemoved = ll.removeLast();
+                System.out.println(operationNumber);
                 assertEquals(buggyALastRemoved, llLastRemoved);
             } else if (operationNumber == 5) {
                 int index = StdRandom.uniform(0, ll.size());
                 int buggyAGet = buggyAList.get(index);
                 int llGet = ll.get(index);
+                System.out.println(operationNumber);
                 assertEquals(buggyAGet, llGet);
             } else if (operationNumber == 6) {
                 int index = StdRandom.uniform(0, ll.size());
                 int recursiveGetNumber = ll.getRecursive(index);
                 int normalGetNumber = ll.get(index);
+                System.out.println(operationNumber);
                 assertEquals(recursiveGetNumber, normalGetNumber);
             }
         }

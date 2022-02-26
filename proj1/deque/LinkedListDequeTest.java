@@ -112,7 +112,7 @@ public class LinkedListDequeTest {
     @Test
     /* Add large number of elements to deque; check if order is correct. */
     public void bigLLDequeTest() {
-        
+
         LinkedListDeque<Integer> lld1 = new LinkedListDeque<Integer>();
         for (int i = 0; i < 1000000; i++) {
             lld1.addLast(i);
@@ -126,6 +126,87 @@ public class LinkedListDequeTest {
             assertEquals("Should have the same value", i, (double) lld1.removeLast(), 0.0);
         }
 
+
+    }
+
+    @Test
+    public void linkedListDequeToStringTest() {
+        String expected = "{s, q, n, h, f, c, a, b, d, e, g, l, m, o, p, r}";
+        LinkedListDeque<String> list1 = new LinkedListDeque<>();
+
+        list1.addLast("a");
+        list1.addLast("b");
+        list1.addFirst("c");
+        list1.addLast("d");
+        list1.addLast("e");
+        list1.addFirst("f");
+        list1.addLast("g");
+        list1.addFirst("h");
+
+        list1.addLast("l");
+        list1.addLast("m");
+        list1.addFirst("n");
+        list1.addLast("o");
+        list1.addLast("p");
+        list1.addFirst("q");
+        list1.addLast("r");
+        list1.addFirst("s");
+
+        assertEquals(expected, list1.toString());
+    }
+
+    @Test
+    public void linkedListDequeEqualsTest() {
+        LinkedListDeque<String> list1 = new LinkedListDeque<>();
+        list1.addLast("g");
+        list1.addFirst("a");
+        list1.addLast("b");
+
+        assertEquals(true, list1.equals(list1));
+
+        LinkedListDeque<String> list2 = new LinkedListDeque<>();
+        list2.addLast("g");
+        list2.addFirst("a");
+        list2.addLast("b");
+
+        assertEquals(true, list1.equals(list2));
+
+        LinkedListDeque<String> list3 = new LinkedListDeque<>();
+        list3.addLast("g");
+        list3.addFirst("a");
+        list3.addLast("b");
+
+        LinkedListDeque<String> list4 = new LinkedListDeque<>();
+        list4.addLast("g");
+        list4.addFirst("b");
+        list4.addLast("b");
+
+        assertEquals(false, list3.equals(list4));
+
+        LinkedListDeque<String> list5 = new LinkedListDeque<>();
+        list5.addLast("g");
+        list5.addFirst("a");
+
+        LinkedListDeque<String> list6 = new LinkedListDeque<>();
+        list6.addLast("g");
+        list6.addFirst("b");
+        list6.addLast("b");
+
+        assertEquals(false, list5.equals(list6));
+
+        ArrayDeque<String> arrayDeque = new ArrayDeque<>();
+        arrayDeque.addLast("g");
+        arrayDeque.addFirst("a");
+        arrayDeque.addLast("b");
+
+        assertEquals(true, list1.equals(arrayDeque));
+
+        ArrayDeque<String> arrayDeque2 = new ArrayDeque<>();
+        arrayDeque.addLast("d");
+        arrayDeque.addFirst("q");
+        arrayDeque.addLast("m");
+
+        assertEquals(false, list1.equals(arrayDeque2));
 
     }
 }

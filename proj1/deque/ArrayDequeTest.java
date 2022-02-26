@@ -191,8 +191,87 @@ public class ArrayDequeTest {
         arrayDeque.addLast("f");
         arrayDeque.addLast("g");
         arrayDeque.addLast("h");
-        
+
         assertEquals(8, arrayDeque.size());
+    }
+
+    @Test
+    public void arrayDequeToStringTest() {
+        String expected = "{s, q, n, h, f, c, a, b, d, e, g, l, m, o, p, r}";
+        ArrayDeque<String> arrayDeque = new ArrayDeque<>();
+        arrayDeque.addLast("a");
+        arrayDeque.addLast("b");
+        arrayDeque.addFirst("c");
+        arrayDeque.addLast("d");
+        arrayDeque.addLast("e");
+        arrayDeque.addFirst("f");
+        arrayDeque.addLast("g");
+        arrayDeque.addFirst("h");
+
+        arrayDeque.addLast("l");
+        arrayDeque.addLast("m");
+        arrayDeque.addFirst("n");
+        arrayDeque.addLast("o");
+        arrayDeque.addLast("p");
+        arrayDeque.addFirst("q");
+        arrayDeque.addLast("r");
+        arrayDeque.addFirst("s");
+
+        assertEquals(expected, arrayDeque.toString());
+    }
+
+    @Test
+    public void arrayDequeEqualsTest() {
+        ArrayDeque<String> arrayDeque1 = new ArrayDeque<>();
+        arrayDeque1.addLast("g");
+        arrayDeque1.addFirst("a");
+        arrayDeque1.addLast("b");
+
+        assertEquals(true, arrayDeque1.equals(arrayDeque1));
+
+        ArrayDeque<String> arrayDeque2 = new ArrayDeque<>();
+        arrayDeque2.addLast("g");
+        arrayDeque2.addFirst("a");
+        arrayDeque2.addLast("b");
+
+        assertEquals(true, arrayDeque1.equals(arrayDeque2));
+
+        ArrayDeque<String> arrayDeque3 = new ArrayDeque<>();
+        arrayDeque3.addLast("g");
+        arrayDeque3.addFirst("a");
+        arrayDeque3.addLast("b");
+
+        LinkedListDeque<String> arrayDeque4 = new LinkedListDeque<>();
+        arrayDeque4.addLast("g");
+        arrayDeque4.addFirst("b");
+        arrayDeque4.addLast("b");
+
+        assertEquals(false, arrayDeque3.equals(arrayDeque4));
+
+        ArrayDeque<String> arrayDeque5 = new ArrayDeque<>();
+        arrayDeque5.addLast("g");
+        arrayDeque5.addFirst("a");
+
+        ArrayDeque<String> arrayDeque6 = new ArrayDeque<>();
+        arrayDeque6.addLast("g");
+        arrayDeque6.addFirst("b");
+        arrayDeque6.addLast("b");
+
+        assertEquals(false, arrayDeque5.equals(arrayDeque6));
+
+        LinkedListDeque<String> ll = new LinkedListDeque<>();
+        ll.addLast("g");
+        ll.addFirst("a");
+        ll.addLast("b");
+
+        assertEquals(true, arrayDeque1.equals(ll));
+
+        LinkedListDeque<String> ll2 = new LinkedListDeque<>();
+        ll2.addLast("d");
+        ll2.addFirst("b");
+        ll2.addLast("c");
+
+        assertEquals(false, arrayDeque1.equals(ll2));
     }
 
     // Randomized test for ArrayDeque
@@ -201,7 +280,7 @@ public class ArrayDequeTest {
         ArrayDeque<Integer> buggyArraydeque = new ArrayDeque<>();
         LinkedListDeque<Integer> ll = new LinkedListDeque<>();
 
-        int N = 8;
+        int N = 50000;
         for (int i = 0; i < N; i += 1) {
             int operationNumber = StdRandom.uniform(0, 6);
             if (operationNumber == 0) {
@@ -218,7 +297,7 @@ public class ArrayDequeTest {
                 int randVal = StdRandom.uniform(0, 100);
                 buggyArraydeque.addFirst(randVal);
                 ll.addFirst(randVal);
-            } else if ((operationNumber == 3 || operationNumber == 4 || operationNumber == 5) && ll.size() == 0) {
+            } else if ((operationNumber == 3 || operationNumber == 4 || operationNumber == 5) && ll.isEmpty() && buggyArraydeque.isEmpty()) {
                 continue;
             } else if (operationNumber == 3) {
                 int buggyAFirstRemoved = buggyArraydeque.removeFirst();
@@ -234,6 +313,7 @@ public class ArrayDequeTest {
                 int llGet = ll.get(index);
                 assertEquals(buggyAGet, llGet);
             }
+            assertEquals(true, buggyArraydeque.equals(ll));
         }
     }
 }

@@ -138,7 +138,7 @@ public class SLList<Blorp> implements List61B<Blorp> {
     @Override
     public void print() {
 //        System.out.println("THIS IS THE OVERRIDDEN VERSION.");
-        System.out.println("The boss doesn't know what he's doing!");
+        // System.out.println("The boss doesn't know what he's doing!");
         for (Node p = sentinel.next; p != null; p = p.next) {
             System.out.print(p.item + " ");
         }

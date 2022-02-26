@@ -1,20 +1,30 @@
-public class Dog implements Animal {
-    @Override
-    public void sniff(Animal a) {
-        System.out.println("dog sniff animal");
+import java.util.Comparator;
+
+public class Dog implements Comparable<Dog> {
+    private String name;
+    private int size;
+
+    public Dog(String n, int s) {
+        name = n;
+        size = s;
     }
 
-    
-    public void praise(Dog a) {
-        System.out.println("u r cool dog");
+    public void bark() {
+        System.out.println(name + " says: bark ");
     }
 
-    public static void main(String[] args) {
-        Animal a = new Dog();
-        Dog d = new Dog();
-        a.greet(d);
-        a.sniff(d);
-        d.praise(d);
-        a.praise(d);
+    // Returns negative number if this dog is less than the dog pointed at by o, and so forth.
+    public int compareTo(Dog uddaDog) {
+        return this.size - uddaDog.size;
+    }
+
+    private static class NameComparator implements Comparator<Dog> {
+        public int compare(Dog a, Dog b) {
+            return a.name.compareTo(b.name);
+        }
+    }
+
+    public static Comparator<Dog> getNameComparator() {
+        return new NameComparator();
     }
 }

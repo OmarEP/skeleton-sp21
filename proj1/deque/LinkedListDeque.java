@@ -180,18 +180,7 @@ public class LinkedListDeque<T> implements Deque<T>, Iterable<T> {
 
     }
 
-    @Override
-    public String toString() {
-        StringBuilder returnSB = new StringBuilder("{");
-        for (int i = 0; i < size - 1; i += 1) {
-            returnSB.append(this.get(i).toString());
-            returnSB.append(", ");
-        }
-        returnSB.append(this.get(size - 1));
-        returnSB.append("}");
-        return returnSB.toString();
-    }
-
+    
     @Override
     public boolean equals(Object other) {
         if (this == other) {
@@ -218,5 +207,5 @@ public class LinkedListDeque<T> implements Deque<T>, Iterable<T> {
         }
         return true;
     }
-    
+
 }

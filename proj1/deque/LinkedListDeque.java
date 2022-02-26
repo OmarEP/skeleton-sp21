@@ -5,9 +5,9 @@ import java.util.Iterator;
 public class LinkedListDeque<T> implements Deque<T>, Iterable<T> {
 
     private class Node {
-        public T item;
-        public Node prev;
-        public Node next;
+        private T item;
+        private Node prev;
+        private Node next;
 
         public Node(Node b, T i, Node n) {
             this.prev = b;
@@ -60,11 +60,6 @@ public class LinkedListDeque<T> implements Deque<T>, Iterable<T> {
         }
         this.size++;
     }
-
-//    @Override
-//    public boolean isEmpty() {
-//        return this.size() == 0;
-//    }
 
     @Override
     public int size() {
@@ -126,6 +121,10 @@ public class LinkedListDeque<T> implements Deque<T>, Iterable<T> {
 
     @Override
     public T get(int index) {
+        if (isEmpty()) {
+            return null;
+        }
+
         if (index < 0 || index >= this.size()) {
             return null;
         }
@@ -139,6 +138,10 @@ public class LinkedListDeque<T> implements Deque<T>, Iterable<T> {
     }
 
     public T getRecursive(int index) {
+        if (isEmpty()) {
+            return null;
+        }
+
         if (index >= this.size()) {
             return null;
         }
@@ -215,64 +218,5 @@ public class LinkedListDeque<T> implements Deque<T>, Iterable<T> {
         }
         return true;
     }
-
-    public static void main(String[] args) {
-        LinkedListDeque<String> list1 = new LinkedListDeque<>();
-        System.out.println("Size: " + list1.size());
-        list1.printDeque();
-
-//        LinkedListDeque<Integer> list2 = new LinkedListDeque<>(20);
-//        list2.addFirst(3);
-//        list2.addLast(100);
-//
-//        list2.removeFirst();
-//        list2.removeLast();
-//        for (int i = 0; i < list2.size(); i++) {
-//            System.out.print(list2.get(i) + " -> ");
-//        }
-//        System.out.print(" null");
-//        System.out.println();
-//
-//        for (int i = 0; i < list2.size(); i++) {
-//            System.out.print(list2.getRecursive(i) + " -> ");
-//        }
-//        System.out.print(" null ");
-//        System.out.println();
-//
-//        System.out.println("Size: " + list2.size());
-//        list2.printDeque();
-//
-//        for (int i = 0; i < list2.size(); i++) {
-//            System.out.print(list2.get(i) + " -> ");
-//        }
-//        System.out.print(" null");
-//        System.out.println();
-//
-//        System.out.println(list2.getRecursive(0));
-//
-//        System.out.println(list2.getRecursive(1));
-//
-//        System.out.println(list2.getRecursive(2));
-
-        list1.addLast("a");
-        list1.addLast("b");
-        list1.addFirst("c");
-        list1.addLast("d");
-        list1.addLast("e");
-        list1.addFirst("f");
-        list1.addLast("g");
-        list1.addFirst("h");
-
-        list1.addLast("l");
-        list1.addLast("m");
-        list1.addFirst("n");
-        list1.addLast("o");
-        list1.addLast("p");
-        list1.addFirst("q");
-        list1.addLast("r");
-        list1.addFirst("s");
-
-
-        System.out.println(list1);
-    }
+    
 }

@@ -194,32 +194,7 @@ public class ArrayDequeTest {
 
         assertEquals(8, arrayDeque.size());
     }
-
-    @Test
-    public void arrayDequeToStringTest() {
-        String expected = "{s, q, n, h, f, c, a, b, d, e, g, l, m, o, p, r}";
-        ArrayDeque<String> arrayDeque = new ArrayDeque<>();
-        arrayDeque.addLast("a");
-        arrayDeque.addLast("b");
-        arrayDeque.addFirst("c");
-        arrayDeque.addLast("d");
-        arrayDeque.addLast("e");
-        arrayDeque.addFirst("f");
-        arrayDeque.addLast("g");
-        arrayDeque.addFirst("h");
-
-        arrayDeque.addLast("l");
-        arrayDeque.addLast("m");
-        arrayDeque.addFirst("n");
-        arrayDeque.addLast("o");
-        arrayDeque.addLast("p");
-        arrayDeque.addFirst("q");
-        arrayDeque.addLast("r");
-        arrayDeque.addFirst("s");
-
-        assertEquals(expected, arrayDeque.toString());
-    }
-
+    
     @Test
     public void arrayDequeEqualsTest() {
         ArrayDeque<String> arrayDeque1 = new ArrayDeque<>();

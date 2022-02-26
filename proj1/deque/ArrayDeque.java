@@ -62,11 +62,6 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T> {
         return index;
     }
 
-//    @Override
-//    public boolean isEmpty() {
-//        return this.size() == 0;
-//    }
-
     @Override
     public int size() {
         return this.size;
@@ -200,53 +195,15 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T> {
         return true;
     }
 
-    @Override
-    public String toString() {
-        StringBuilder returnSB = new StringBuilder("{");
-        for (int i = 0; i < size - 1; i += 1) {
-            returnSB.append(this.get(i).toString());
-            returnSB.append(", ");
-        }
-        returnSB.append(this.get(size - 1));
-        returnSB.append("}");
-        return returnSB.toString();
-    }
-
-    public static void main(String[] args) {
-        ArrayDeque<String> arrayDeque = new ArrayDeque<>();
-        arrayDeque.addLast("a");
-        arrayDeque.addLast("b");
-        arrayDeque.addFirst("c");
-        arrayDeque.addLast("d");
-        arrayDeque.addLast("e");
-        arrayDeque.addFirst("f");
-        arrayDeque.addLast("g");
-        arrayDeque.addFirst("h");
-
-        arrayDeque.addLast("l");
-        arrayDeque.addLast("m");
-        arrayDeque.addFirst("n");
-        arrayDeque.addLast("o");
-        arrayDeque.addLast("p");
-        arrayDeque.addFirst("q");
-        arrayDeque.addLast("r");
-        arrayDeque.addFirst("s");
-
-//        arrayDeque.removeFirst();
-//        arrayDeque.removeLast();
-//        arrayDeque.removeFirst();
-//        arrayDeque.removeLast();
-//        arrayDeque.removeLast();
-//        arrayDeque.removeLast();
-//        arrayDeque.removeFirst();
-//        arrayDeque.removeLast();
-//        arrayDeque.removeFirst();
-//        arrayDeque.removeLast();
-//
-//        arrayDeque.addFirst("k");
-
-//        arrayDeque.printDeque();
-
-        System.out.println(arrayDeque);
-    }
+//    @Override
+//    public String toString() {
+//        StringBuilder returnSB = new StringBuilder("{");
+//        for (int i = 0; i < size - 1; i += 1) {
+//            returnSB.append(this.get(i).toString());
+//            returnSB.append(", ");
+//        }
+//        returnSB.append(this.get(size - 1));
+//        returnSB.append("}");
+//        return returnSB.toString();
+//    }
 }

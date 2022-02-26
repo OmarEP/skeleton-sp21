@@ -1,6 +1,9 @@
 package deque;
 
+import edu.princeton.cs.algs4.StdRandom;
 import org.junit.Test;
+
+import java.util.ArrayList;
 
 import static org.junit.Assert.*;
 
@@ -194,19 +197,155 @@ public class LinkedListDequeTest {
 
         assertEquals(false, list5.equals(list6));
 
-        ArrayDeque<String> arrayDeque = new ArrayDeque<>();
-        arrayDeque.addLast("g");
-        arrayDeque.addFirst("a");
-        arrayDeque.addLast("b");
+        ArrayDeque<String> arrayDeque1 = new ArrayDeque<>();
+        arrayDeque1.addLast("g");
+        arrayDeque1.addFirst("a");
+        arrayDeque1.addLast("b");
 
-        assertEquals(true, list1.equals(arrayDeque));
+        assertEquals(true, list1.equals(arrayDeque1));
 
         ArrayDeque<String> arrayDeque2 = new ArrayDeque<>();
-        arrayDeque.addLast("d");
-        arrayDeque.addFirst("q");
-        arrayDeque.addLast("m");
+        arrayDeque1.addLast("d");
+        arrayDeque1.addFirst("q");
+        arrayDeque1.addLast("m");
 
         assertEquals(false, list1.equals(arrayDeque2));
 
+    }
+
+    @Test
+    public void emptyFillUpAgain() {
+
+        LinkedListDeque<String> linkedList = new LinkedListDeque<>();
+        linkedList.addFirst("a");
+        linkedList.addFirst("b");
+        linkedList.addFirst("c");
+        linkedList.addFirst("d");
+        linkedList.addFirst("e");
+        linkedList.addFirst("f");
+        linkedList.addFirst("h");
+        linkedList.addFirst("g");
+
+        linkedList.removeFirst();
+        linkedList.removeFirst();
+        linkedList.removeFirst();
+        linkedList.removeFirst();
+        linkedList.removeFirst();
+        linkedList.removeFirst();
+        linkedList.removeFirst();
+        linkedList.removeFirst();
+        linkedList.removeFirst();
+
+        linkedList.addFirst("a");
+        linkedList.addFirst("b");
+        linkedList.addFirst("c");
+        linkedList.addFirst("d");
+        linkedList.addFirst("e");
+        linkedList.addFirst("f");
+        linkedList.addFirst("h");
+        linkedList.addFirst("g");
+
+        linkedList.removeFirst();
+        linkedList.removeFirst();
+        linkedList.removeFirst();
+        linkedList.removeFirst();
+        linkedList.removeFirst();
+        linkedList.removeFirst();
+        linkedList.removeFirst();
+        linkedList.removeFirst();
+
+        linkedList.addFirst("a");
+        linkedList.addFirst("b");
+        linkedList.addFirst("c");
+        linkedList.addFirst("d");
+        linkedList.addFirst("e");
+        linkedList.addFirst("f");
+        linkedList.addFirst("h");
+        linkedList.addFirst("g");
+
+        linkedList.removeLast();
+        linkedList.removeLast();
+        linkedList.removeLast();
+        linkedList.removeLast();
+        linkedList.removeLast();
+        linkedList.removeLast();
+        linkedList.removeLast();
+        linkedList.removeLast();
+
+        linkedList.addLast("a");
+        linkedList.addLast("b");
+        linkedList.addLast("c");
+        linkedList.addLast("d");
+        linkedList.addLast("e");
+        linkedList.addLast("f");
+        linkedList.addLast("g");
+        linkedList.addLast("h");
+
+        linkedList.removeLast();
+        linkedList.removeLast();
+        linkedList.removeLast();
+        linkedList.removeLast();
+        linkedList.removeLast();
+        linkedList.removeLast();
+        linkedList.removeLast();
+        linkedList.removeLast();
+
+        linkedList.addLast("a");
+        linkedList.addLast("b");
+        linkedList.addLast("c");
+        linkedList.addLast("d");
+        linkedList.addLast("e");
+        linkedList.addLast("f");
+        linkedList.addLast("g");
+        linkedList.addLast("h");
+
+        assertEquals(8, linkedList.size());
+    }
+
+    // Randomized test for ArrayDeque
+    @Test
+    public void randomizedTest() {
+        ArrayList<Integer> buggyAList = new ArrayList<>();
+        LinkedListDeque<Integer> ll = new LinkedListDeque<>();
+
+        int N = 100000;
+        for (int i = 0; i < N; i += 1) {
+            int operationNumber = StdRandom.uniform(0, 7);
+            if (operationNumber == 0) {
+                // addLast
+                int randVal = StdRandom.uniform(0, 100);
+                buggyAList.add(randVal);
+                ll.addLast(randVal);
+            } else if (operationNumber == 1) {
+                // size
+                int buggyArraySize = buggyAList.size();
+                int llSize = ll.size();
+                assertEquals(buggyArraySize, llSize);
+            } else if (operationNumber == 2) {
+                int randVal = StdRandom.uniform(0, 100);
+                buggyAList.add(0, randVal);
+                ll.addFirst(randVal);
+            } else if ((operationNumber == 3 || operationNumber == 4 || operationNumber == 5 || operationNumber == 6) && ll.isEmpty() && buggyAList.isEmpty()) {
+                continue;
+            } else if (operationNumber == 3) {
+                int buggyAFirstRemoved = buggyAList.remove(0);
+                int llFirstRemoved = ll.removeFirst();
+                assertEquals(buggyAFirstRemoved, llFirstRemoved);
+            } else if (operationNumber == 4) {
+                int buggyALastRemoved = buggyAList.remove(buggyAList.size() - 1);
+                int llLastRemoved = ll.removeLast();
+                assertEquals(buggyALastRemoved, llLastRemoved);
+            } else if (operationNumber == 5) {
+                int index = StdRandom.uniform(0, ll.size());
+                int buggyAGet = buggyAList.get(index);
+                int llGet = ll.get(index);
+                assertEquals(buggyAGet, llGet);
+            } else if (operationNumber == 6) {
+                int index = StdRandom.uniform(0, ll.size());
+                int recursiveGetNumber = ll.getRecursive(index);
+                int normalGetNumber = ll.get(index);
+                assertEquals(recursiveGetNumber, normalGetNumber);
+            }
+        }
     }
 }

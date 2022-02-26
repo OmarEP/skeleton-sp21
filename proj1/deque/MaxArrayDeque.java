@@ -35,43 +35,5 @@ public class MaxArrayDeque<T> extends ArrayDeque<T> {
         }
         return max;
     }
-
-
-    public static void main(String[] args) {
-        Comparator<Integer> cp = new Comparator<Integer>() {
-            public int compare(Integer integer, Integer t1) {
-                return integer - t1;
-            }
-        };
-
-        Comparator<Integer> sp = new Comparator<Integer>() {
-            public int compare(Integer integer, Integer t1) {
-                return (integer * 2) - t1;
-            }
-        };
-
-        Comparator<String> sc = new Comparator<String>() {
-            public int compare(String s, String t1) {
-                return s.compareTo(t1);
-            }
-        };
-
-        MaxArrayDeque<Integer> maxArrayDeque = new MaxArrayDeque<>(cp);
-        maxArrayDeque.addFirst(50);
-        maxArrayDeque.addFirst(12);
-        maxArrayDeque.addFirst(2);
-        maxArrayDeque.addFirst(25);
-        maxArrayDeque.addFirst(30);
-
-        MaxArrayDeque<String> maxArrayDequeString = new MaxArrayDeque<>(sc);
-        maxArrayDequeString.addFirst("cat");
-        maxArrayDequeString.addFirst("dog");
-        maxArrayDequeString.addFirst("aadvark");
-        maxArrayDequeString.addFirst("ant");
-        maxArrayDequeString.addFirst("whale");
-
-        System.out.println(maxArrayDeque.max());
-        System.out.println(maxArrayDeque.max(sp));
-        System.out.println(maxArrayDequeString.max());
-    }
+    
 }

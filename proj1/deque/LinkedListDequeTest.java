@@ -307,13 +307,13 @@ public class LinkedListDequeTest {
                 int randVal = StdRandom.uniform(0, 100);
                 buggyAList.add(randVal);
                 ll.addLast(randVal);
-                System.out.println(operationNumber);
+//                System.out.println(operationNumber);
             } else if (operationNumber == 1) {
                 // size
                 int buggyArraySize = buggyAList.size();
                 int llSize = ll.size();
                 assertEquals(buggyArraySize, llSize);
-                System.out.println(operationNumber);
+//                System.out.println(operationNumber);
             } else if (operationNumber == 2) {
                 int randVal = StdRandom.uniform(0, 100);
                 buggyAList.add(0, randVal);
@@ -323,24 +323,24 @@ public class LinkedListDequeTest {
             } else if (operationNumber == 3) {
                 int buggyAFirstRemoved = buggyAList.remove(0);
                 int llFirstRemoved = ll.removeFirst();
-                System.out.println(operationNumber);
+//                System.out.println(operationNumber);
                 assertEquals(buggyAFirstRemoved, llFirstRemoved);
             } else if (operationNumber == 4) {
                 int buggyALastRemoved = buggyAList.remove(buggyAList.size() - 1);
                 int llLastRemoved = ll.removeLast();
-                System.out.println(operationNumber);
+//                System.out.println(operationNumber);
                 assertEquals(buggyALastRemoved, llLastRemoved);
             } else if (operationNumber == 5) {
                 int index = StdRandom.uniform(0, ll.size());
                 int buggyAGet = buggyAList.get(index);
                 int llGet = ll.get(index);
-                System.out.println(operationNumber);
+//                System.out.println(operationNumber);
                 assertEquals(buggyAGet, llGet);
             } else if (operationNumber == 6) {
                 int index = StdRandom.uniform(0, ll.size());
                 int recursiveGetNumber = ll.getRecursive(index);
                 int normalGetNumber = ll.get(index);
-                System.out.println(operationNumber);
+//                System.out.println(operationNumber);
                 assertEquals(recursiveGetNumber, normalGetNumber);
             }
         }

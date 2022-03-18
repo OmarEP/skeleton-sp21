@@ -1,4 +1,6 @@
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 public class ArraySet<T> implements Iterable<T> {
     private T[] items;
@@ -64,6 +66,7 @@ public class ArraySet<T> implements Iterable<T> {
 
     }
 
+    /*
     @Override
     public String toString() {
         StringBuilder returnSB = new StringBuilder("{");
@@ -74,6 +77,24 @@ public class ArraySet<T> implements Iterable<T> {
         returnSB.append(items[size - 1]);
         returnSB.append("}");
         return returnSB.toString();
+    }
+     */
+
+    @Override
+    public String toString() {
+        List<String> listOfItems = new ArrayList<>();
+        for (T x : this) {
+            listOfItems.add(x.toString());
+        }
+        return "{" + String.join(", ", listOfItems) + "}";
+    }
+
+    public static <Item> ArraySet<Item> of(Item... stuff) {
+        ArraySet<Item> returnSet = new ArraySet<Item>();
+        for (Item x : stuff) {
+            returnSet.add(x);
+        }
+        return returnSet;
     }
 
     @Override
@@ -120,5 +141,8 @@ public class ArraySet<T> implements Iterable<T> {
         System.out.println(aset.equals(null));
         System.out.println(aset.equals("fish"));
         System.out.println(aset.equals(aset));
+
+        ArraySet<String> asetOfStrings = ArraySet.of("hi", "I'm", "here");
+        System.out.println(asetOfStrings);
     }
 }

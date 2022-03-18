@@ -1,9 +1,11 @@
 package capers;
 
 import java.io.File;
+import java.io.IOException;
+
 import static capers.Utils.*;
 
-/** A repository for Capers 
+/** A repository for Capers
  * @author TODO
  * The structure of a Capers Repository is as follows:
  *
@@ -18,9 +20,9 @@ public class CapersRepository {
     static final File CWD = new File(System.getProperty("user.dir"));
 
     /** Main metadata folder. */
-    static final File CAPERS_FOLDER = null; // TODO Hint: look at the `join`
+    static final File CAPERS_FOLDER = join(CWD, ".capers"); // TODO Hint: look at the `join`
                                             //      function in Utils
-
+    static final File STORY = join(CAPERS_FOLDER, "story.txt");
     /**
      * Does required filesystem operations to allow for persistence.
      * (creates any necessary folders or files)
@@ -32,6 +34,21 @@ public class CapersRepository {
      */
     public static void setupPersistence() {
         // TODO
+        if (!CAPERS_FOLDER.exists()) {
+            CAPERS_FOLDER.mkdir();
+        }
+
+        if (!Dog.DOG_FOLDER.exists()) {
+            Dog.DOG_FOLDER.mkdir();
+        }
+
+        if (!STORY.exists()) {
+           try {
+               STORY.createNewFile();
+           } catch (IOException e) {
+               e.printStackTrace();
+           }
+        }
     }
 
     /**
@@ -41,6 +58,8 @@ public class CapersRepository {
      */
     public static void writeStory(String text) {
         // TODO
+        Utils.writeContents(STORY, Utils.readContentsAsString(STORY) + text + "\n");
+        System.out.println(readContentsAsString(STORY));
     }
 
     /**
@@ -50,6 +69,9 @@ public class CapersRepository {
      */
     public static void makeDog(String name, String breed, int age) {
         // TODO
+        Dog dog = new Dog(name, breed, age);
+        dog.saveDog();
+        System.out.println(dog);
     }
 
     /**
@@ -60,5 +82,9 @@ public class CapersRepository {
      */
     public static void celebrateBirthday(String name) {
         // TODO
+        File d = join(Dog.DOG_FOLDER, name);
+        Dog dog = Dog.fromFile(name);
+        dog.haveBirthday();
+        Utils.writeObject(d, dog);
     }
 }

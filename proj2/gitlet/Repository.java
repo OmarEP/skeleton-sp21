@@ -1,7 +1,9 @@
 package gitlet;
 
 import java.io.File;
-import static gitlet.Utils.*;
+import java.io.IOException;
+
+import static gitlet.Utils.join;
 
 // TODO: any imports you need here
 
@@ -22,8 +24,90 @@ public class Repository {
 
     /** The current working directory. */
     public static final File CWD = new File(System.getProperty("user.dir"));
+
     /** The .gitlet directory. */
     public static final File GITLET_DIR = join(CWD, ".gitlet");
 
+    // The branches folder
+    public static final File BRANCHES = join(GITLET_DIR, "branches");
+
+    // The master branch
+    public static final File MASTER = join(BRANCHES, "master");
+
+    // The HEAD pointer
+    public static final File HEAD = join(GITLET_DIR, "HEAD");
+
+
+    // Stage Repository
+    private static Stage stage;
+
+
+
     /* TODO: fill in the rest of this class. */
+    public static void initCommand() {
+        if (!GITLET_DIR.exists()) {
+            GITLET_DIR.mkdir();
+        }
+
+        if (!Commit.COMMIT_DIR.exists()) {
+            Commit.COMMIT_DIR.mkdir();
+        }
+
+        if (!Blob.BLOB_DIR.exists()) {
+            Blob.BLOB_DIR.mkdir();
+        }
+
+        if (!BRANCHES.exists()) {
+            BRANCHES.mkdir();
+        }
+
+        if (!MASTER.exists()) {
+            try {
+                MASTER.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        if (!HEAD.exists()) {
+            try {
+                HEAD.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        if (!Stage.INDEX.exists()) {
+            try {
+                Stage.INDEX.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        stage = new Stage();
+
+        Utils.writeObject(Stage.INDEX, stage);
+
+        Commit initialCommit = new Commit();
+        File initialCommitFile = Utils.join(Commit.COMMIT_DIR, Utils.sha1("initialCommit"));
+        Utils.writeObject(initialCommitFile, initialCommit);
+
+        Utils.writeObject(HEAD, initialCommit);
+        Utils.writeObject(MASTER, initialCommit);
+    }
+
+
+
+    public static void addCommand(String filename) {
+        stage = Utils.readObject(Stage.INDEX, Stage.class);
+
+        stage.add(filename);
+
+        Utils.writeObject(Stage.INDEX, stage);
+    }
+
+    public static void commitCommand(String message) {
+
+    }
 }

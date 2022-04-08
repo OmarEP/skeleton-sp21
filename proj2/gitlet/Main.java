@@ -6,7 +6,7 @@ package gitlet;
 public class Main {
 
     /** Usage: java gitlet.Main ARGS, where ARGS contains
-     *  <COMMAND> <OPERAND1> <OPERAND2> ... 
+     *  <COMMAND> <OPERAND1> <OPERAND2> ...
      */
     public static void main(String[] args) {
         // TODO: what if args is empty?
@@ -14,9 +14,11 @@ public class Main {
         switch(firstArg) {
             case "init":
                 // TODO: handle the `init` command
+                Repository.initCommand();
                 break;
             case "add":
                 // TODO: handle the `add [filename]` command
+                Repository.addCommand(args[1]);
                 break;
             // TODO: FILL THE REST IN
         }

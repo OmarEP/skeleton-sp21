@@ -21,6 +21,9 @@ public class Main {
                 Repository.addCommand(args[1]);
                 break;
             // TODO: FILL THE REST IN
+            case "commit":
+                Repository.commitCommand(args[1]);
+                break;
         }
     }
 }

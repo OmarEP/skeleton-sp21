@@ -2,6 +2,7 @@ package gitlet;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Objects;
 
 import static gitlet.Utils.join;
 
@@ -90,7 +91,7 @@ public class Repository {
         Utils.writeObject(Stage.INDEX, stage);
 
         Commit initialCommit = new Commit();
-        File initialCommitFile = Utils.join(Commit.COMMIT_DIR, Utils.sha1("initialCommit"));
+        File initialCommitFile = Utils.join(Commit.COMMIT_DIR, Utils.sha1(initialCommit.getMessage(), initialCommit.getTimestamp().toString(), Objects.toString(initialCommit.getParentCommit())));
         Utils.writeObject(initialCommitFile, initialCommit);
 
         Utils.writeObject(HEAD, initialCommit);
@@ -108,6 +109,16 @@ public class Repository {
     }
 
     public static void commitCommand(String message) {
+        stage = Utils.readObject(Stage.INDEX, Stage.class);
 
+        Commit curentCommit = new Commit(message, HEAD, stage);
+
+        Utils.writeObject(join(Commit.COMMIT_DIR, Utils.sha1(Objects.toString(curentCommit.getParentCommit()), curentCommit.getMessage(), curentCommit.getTimestamp().toString())), curentCommit);
+        stage.getStageForAddition().clear();
+
+        Utils.writeObject(Stage.INDEX, stage);
+
+        Utils.writeObject(HEAD, curentCommit);
+        Utils.writeObject(MASTER, curentCommit);
     }
 }

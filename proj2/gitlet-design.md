@@ -41,9 +41,9 @@
 ## Algorithms
 1. java gitlet.Main init: Creates a folder for blobs, and a folder for commits
 2. java gitlet.Main add .... : This command will add the following file(s) into the "Staged for addition" TreeMap, while simultaneously creating a blob for said file(s), and creating a key->value pair with the filename of the file and it's correspoding blob inside the TreeMap(filename->blob) Creates an "index" text file. The "index" text file will have all the key->value pairs inside the "Staged for addition" TreeMap.
-3. java gitlet.Main commit ... : This command will clone(will figure out how to do this later) the current HEAD commit, and insert the correct MetaData(message, timestamp), save the parent Commit's SHA1 inside an instance variable, and adding the "filename(s)" of the files commited inside it's internal TreeMap. Therefore creating a key->value pair between filenames and their respective blobs(filename->blob);
-
-
+3. java gitlet.Main commit ... : This command will clone(will figure out how to do this later) the current HEAD commit, and insert the correct MetaData(message, timestamp), save the parent Commit's SHA1 inside an instance variable, and adding the "filename(s)" of the files commited inside it's internal TreeMap. Therefore creating a key->value pair between filenames and their respective blob's SHA1 (filename->blob's SHA1);
+4. the SHA-1 hash value, rendered as a 40-character hexadecimal string, makes a convenient file name for storing your data in your .gitlet directory. It also gives you a convenient way to compare two files (blobs) to see if they have the same contents: if their SHA-1s are the same, we simply assume the files are the same.
+5.  As you can see, each commit (rectangle) points to some blobs (circles), which contain file contents. The commits contain the file names and references to these blobs, as well as a parent link. These references, depicted as arrows, are represented in the .gitlet directory using their SHA-1 hash values.
 ## Persistence
 1. For the staging area: An "index" text file is created after the first "gitlet add". The "index" text file will have the "stage class" serialized/saved inside it.
 2. Blobs will be stored inside a directory. Each blob will be linked their respective filename at the moment they are "added" inside the staging area.

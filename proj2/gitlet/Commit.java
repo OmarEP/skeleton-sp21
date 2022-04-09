@@ -5,6 +5,7 @@ package gitlet;
 import java.io.File;
 import java.io.Serializable;
 import java.util.Date;
+import java.util.Objects;
 import java.util.TreeMap;
 
 import static gitlet.Utils.join;
@@ -33,7 +34,7 @@ public class Commit implements Serializable {
 
     private String parentCommit;
 
-    private static TreeMap<String, Blob> blobs;
+    private static TreeMap<String, String> blobs;
 
     /* TODO: fill in the rest of this class. */
     public Commit() {
@@ -43,10 +44,25 @@ public class Commit implements Serializable {
         blobs = new TreeMap<>();
     }
 
-    public Commit(String message, String parentCommit) {
+    public Commit(String message, File headCommit, Stage stagingArea) {
+        blobs = new TreeMap<>();
+        Commit parentCommit = Utils.readObject(Repository.HEAD, Commit.class);
+        TreeMap<String, String> tempStagingArea = stagingArea.getStageForAddition();
         this.message = message;
         this.timestamp = new Date();
-        this.parentCommit = parentCommit;
-        blobs = new TreeMap<>();
+        this.parentCommit = Utils.sha1(parentCommit.getTimestamp().toString(), parentCommit.getMessage(), Objects.toString(parentCommit.getParentCommit()));
+        blobs.putAll(tempStagingArea);
+    }
+
+    public Date getTimestamp() {
+        return timestamp;
+    }
+
+    public String getMessage() {
+        return message;
+    }
+
+    public String getParentCommit() {
+        return parentCommit;
     }
 }

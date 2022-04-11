@@ -38,6 +38,8 @@ public class Repository {
     // The HEAD pointer
     public static final File HEAD = join(GITLET_DIR, "HEAD");
 
+    // The Commit's blob treemap's file
+    public static final File COMMIT_INFO = join(GITLET_DIR, "COMMIT_INFO");
 
     // Stage Repository
     private static Stage stage;
@@ -86,6 +88,14 @@ public class Repository {
             }
         }
 
+        if (!COMMIT_INFO.exists()) {
+            try {
+                COMMIT_INFO.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
         stage = new Stage();
 
         Utils.writeObject(Stage.INDEX, stage);
@@ -103,7 +113,7 @@ public class Repository {
     public static void addCommand(String filename) {
         stage = Utils.readObject(Stage.INDEX, Stage.class);
 
-        stage.add(filename);
+        stage.add(filename, HEAD);
 
         Utils.writeObject(Stage.INDEX, stage);
     }

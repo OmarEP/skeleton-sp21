@@ -45,13 +45,28 @@ public class Commit implements Serializable {
     }
 
     public Commit(String message, File headCommit, Stage stagingArea) {
-        blobs = new TreeMap<>();
         Commit parentCommit = Utils.readObject(Repository.HEAD, Commit.class);
+        blobs = new TreeMap<>();
+        blobs.putAll(parentCommit.getBlobTreeMap());
+
         TreeMap<String, String> tempStagingArea = stagingArea.getStageForAddition();
+        for (String key : tempStagingArea.keySet()) {
+            if (blobs.containsKey(key)) {
+                if (!isSameBlob(blobs.get(key), tempStagingArea.get(key))) {
+                    blobs.put(key, tempStagingArea.get(key));
+                }
+            } else {
+                blobs.put(key, tempStagingArea.get(key));
+            }
+        }
+
         this.message = message;
         this.timestamp = new Date();
         this.parentCommit = Utils.sha1(parentCommit.getTimestamp().toString(), parentCommit.getMessage(), Objects.toString(parentCommit.getParentCommit()));
-        blobs.putAll(tempStagingArea);
+    }
+
+    private boolean isSameBlob(String firstBlob, String secondBlob) {
+        return firstBlob.equals(secondBlob);
     }
 
     public Date getTimestamp() {
@@ -64,5 +79,9 @@ public class Commit implements Serializable {
 
     public String getParentCommit() {
         return parentCommit;
+    }
+
+    public TreeMap<String, String> getBlobTreeMap() {
+        return blobs;
     }
 }

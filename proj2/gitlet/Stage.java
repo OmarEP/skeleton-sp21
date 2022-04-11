@@ -5,7 +5,6 @@ import java.io.Serializable;
 import java.util.TreeMap;
 
 import static gitlet.Utils.join;
-import static gitlet.Utils.sha1;
 
 public class Stage implements Serializable {
 
@@ -23,23 +22,55 @@ public class Stage implements Serializable {
         stageForRemoval = new TreeMap<String, String>();
     }
 
-    public void add(String filename) {
+    public void add(String filename, File HEAD) {
+        // Read the current head commit into an object
+        Commit headCommit = Utils.readObject(HEAD, Commit.class);
 
+        // Create a blob from the current filename
         Blob blob = new Blob(filename);
 
-        File file = join(Repository.CWD, filename);
-        String contents = Utils.readContentsAsString(file);
+        // Blob treemap from head commit
+        TreeMap<String, String> headCommitBlobTreeMap = headCommit.getBlobTreeMap();
 
-        Utils.writeObject(join(Blob.BLOB_DIR, sha1(contents)), blob);
+        // If the current stageForAddition treemap contains the filename as a key, then we replace it with the previous
+        // blob with the new one.
+        if (stageForAddition.containsKey(filename) && headCommitBlobTreeMap != null && !headCommitBlobTreeMap.containsKey(filename)) {
+            Utils.writeObject(join(Blob.BLOB_DIR, blob.getHashCode()), blob);
 
-        stageForAddition.put(filename, sha1(contents));
+            stageForAddition.put(filename, blob.getHashCode());
+        /*
+            If the current working version of the file is identical to the version in the current commit, do not stage it to be added,
+            and remove it from the staging area if it is already there (as can happen when a file is changed, added, and then changed
+            back to it’s original version).
+         */
+        } else if (stageForAddition.containsKey(filename) && headCommitBlobTreeMap != null && headCommitBlobTreeMap.containsKey(filename) && isSameBlob(blob.getHashCode(), headCommitBlobTreeMap.get(filename))) {
+            stageForAddition.remove(filename);
+
+        // if the head commit's blob treemap contains the filename as a key and the contents of both blobs are different.
+        } else if (headCommitBlobTreeMap != null && headCommitBlobTreeMap.containsKey(filename) && !isSameBlob(blob.getHashCode(), headCommitBlobTreeMap.get(filename))) {
+                Utils.writeObject(join(Blob.BLOB_DIR, blob.getHashCode()), blob);
+
+                stageForAddition.put(filename, blob.getHashCode());
+
+        // Otherwise, just add the current blob into the stageForAddition treemap
+        } else {
+            Utils.writeObject(join(Blob.BLOB_DIR, blob.getHashCode()), blob);
+
+            stageForAddition.put(filename, blob.getHashCode());
+        }
+    }
+
+    private boolean isSameBlob(String firstBlob, String secondBlob) {
+        return firstBlob.equals(secondBlob);
+    }
+
+    public TreeMap<String, String> getStageForAddition() {
+        return stageForAddition;
     }
 
     public void remove(String filename) {
 
     }
 
-    public TreeMap<String, String> getStageForAddition() {
-        return stageForAddition;
-    }
+
 }

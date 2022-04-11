@@ -12,19 +12,31 @@ public class Blob implements Serializable {
     public static final File BLOB_DIR = join(Repository.GITLET_DIR, "blobs");
 
     // The parent file's filename
-    private String parentFile;
+    private String parentFileName;
 
     // The blob's own hashcode?
-     private String hashCode;
+    private String hashCode;
 
     // The parent's file content
     private String content;
 
     public Blob(String fileName) {
-        parentFile = fileName;
+        parentFileName = fileName;
 
         content = Utils.readContentsAsString(join(Repository.CWD, fileName));
 
         hashCode = sha1(content);
+    }
+
+    public String getParentFileName() {
+        return parentFileName;
+    }
+
+    public String getHashCode() {
+        return hashCode;
+    }
+
+     public String getContent() {
+        return content;
     }
 }

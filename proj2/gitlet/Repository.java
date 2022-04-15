@@ -38,9 +38,6 @@ public class Repository {
     // The HEAD pointer
     public static final File HEAD = join(GITLET_DIR, "HEAD");
 
-    // The Commit's blob treemap's file
-    public static final File COMMIT_INFO = join(GITLET_DIR, "COMMIT_INFO");
-
     // Stage Repository
     private static Stage stage;
 
@@ -88,14 +85,6 @@ public class Repository {
             }
         }
 
-        if (!COMMIT_INFO.exists()) {
-            try {
-                COMMIT_INFO.createNewFile();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-
         stage = new Stage();
 
         Utils.writeObject(Stage.INDEX, stage);
@@ -130,5 +119,49 @@ public class Repository {
 
         Utils.writeObject(HEAD, curentCommit);
         Utils.writeObject(MASTER, curentCommit);
+    }
+
+    public static void checkoutCommand(String filename) {
+        Commit headCommit = Utils.readObject(HEAD, Commit.class);
+
+        if (headCommit.getBlobTreeMap().containsKey(filename)) {
+            Blob blob = Utils.readObject(join(Blob.BLOB_DIR, headCommit.getBlobTreeMap().get(filename)), Blob.class);
+            Utils.writeContents(join(CWD, filename), blob.getContent());
+        } else {
+            System.out.println("File does not exist in that commit.");
+            System.exit(0);
+        }
+    }
+
+    public static void checkoutCommand(String commitId, String filename) {
+        if (commitId.length() < 40 && Utils.plainFilenamesIn(Commit.COMMIT_DIR) != null) {
+
+            for (String file : Utils.plainFilenamesIn(Commit.COMMIT_DIR)) {
+                if (file.startsWith(commitId)) {
+                    Commit currentCommit = Utils.readObject(join(Commit.COMMIT_DIR, file), Commit.class);
+
+                    if (currentCommit.getBlobTreeMap().containsKey(filename)) {
+                        Blob blob = Utils.readObject(join(Blob.BLOB_DIR, currentCommit.getBlobTreeMap().get(filename)), Blob.class);
+                        Utils.writeContents(join(CWD, filename), blob.getContent());
+                    } else {
+                        System.out.println("File does not exist in that commit.");
+                        System.exit(0);
+                    }
+                }
+            }
+        } else if (Utils.join(Commit.COMMIT_DIR, commitId).exists()) {
+                Commit currentCommit = Utils.readObject(join(Commit.COMMIT_DIR, commitId), Commit.class);
+
+                if (currentCommit.getBlobTreeMap().containsKey(filename)) {
+                    Blob blob = Utils.readObject(join(Blob.BLOB_DIR, currentCommit.getBlobTreeMap().get(filename)), Blob.class);
+                    Utils.writeContents(join(CWD, filename), blob.getContent());
+                } else {
+                    System.out.println("File does not exist in that commit.");
+                    System.exit(0);
+                }
+        } else {
+            System.out.println("File does not exist in that commit.");
+            System.exit(0);
+        }
     }
 }

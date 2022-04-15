@@ -24,6 +24,17 @@ public class Main {
             case "commit":
                 Repository.commitCommand(args[1]);
                 break;
+            case "checkout":
+                if (args.length < 3 || args.length > 4) {
+                    System.out.println("Incorrect operands.");
+                    System.exit(0);
+                } else if (args.length == 3) {
+                    Repository.checkoutCommand(args[2]);
+                } else  {
+                    Repository.checkoutCommand(args[2], args[3]);
+                }
+
+                break;
         }
     }
 }

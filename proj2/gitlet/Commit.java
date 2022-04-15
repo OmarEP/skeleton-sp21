@@ -34,7 +34,7 @@ public class Commit implements Serializable {
 
     private String parentCommit;
 
-    private static TreeMap<String, String> blobs;
+    private TreeMap<String, String> blobs;
 
     /* TODO: fill in the rest of this class. */
     public Commit() {
@@ -63,6 +63,7 @@ public class Commit implements Serializable {
         this.message = message;
         this.timestamp = new Date();
         this.parentCommit = Utils.sha1(parentCommit.getTimestamp().toString(), parentCommit.getMessage(), Objects.toString(parentCommit.getParentCommit()));
+
     }
 
     private boolean isSameBlob(String firstBlob, String secondBlob) {

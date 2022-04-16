@@ -32,7 +32,9 @@ public class Commit implements Serializable {
 
     private Date timestamp;
 
-    private String parentCommit;
+    private String firstParentCommit;
+
+    private String secondParentCommit;
 
     private TreeMap<String, String> blobs;
 
@@ -40,7 +42,8 @@ public class Commit implements Serializable {
     public Commit() {
         this.message = "initial commit";
         this.timestamp = new Date(0);
-        this.parentCommit = null;
+        this.firstParentCommit = null;
+        this.secondParentCommit = null;
         blobs = new TreeMap<>();
     }
 
@@ -62,7 +65,7 @@ public class Commit implements Serializable {
 
         this.message = message;
         this.timestamp = new Date();
-        this.parentCommit = Utils.sha1(parentCommit.getTimestamp().toString(), parentCommit.getMessage(), Objects.toString(parentCommit.getParentCommit()));
+        this.firstParentCommit = parentCommit.getHashCode();
 
     }
 
@@ -78,11 +81,19 @@ public class Commit implements Serializable {
         return message;
     }
 
-    public String getParentCommit() {
-        return parentCommit;
+    public String getFirstParentCommit() {
+        return firstParentCommit;
+    }
+
+    public String getSecondParentCommit() {
+        return secondParentCommit;
     }
 
     public TreeMap<String, String> getBlobTreeMap() {
         return blobs;
+    }
+
+    public String getHashCode() {
+        return Utils.sha1(this.getTimestamp().toString(), this.getMessage(), Objects.toString(this.getFirstParentCommit()), Objects.toString(this.secondParentCommit));
     }
 }

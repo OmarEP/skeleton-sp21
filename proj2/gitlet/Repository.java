@@ -2,7 +2,7 @@ package gitlet;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Objects;
+import java.util.Formatter;
 
 import static gitlet.Utils.join;
 
@@ -90,7 +90,7 @@ public class Repository {
         Utils.writeObject(Stage.INDEX, stage);
 
         Commit initialCommit = new Commit();
-        File initialCommitFile = Utils.join(Commit.COMMIT_DIR, Utils.sha1(initialCommit.getMessage(), initialCommit.getTimestamp().toString(), Objects.toString(initialCommit.getParentCommit())));
+        File initialCommitFile = Utils.join(Commit.COMMIT_DIR,initialCommit.getHashCode());
         Utils.writeObject(initialCommitFile, initialCommit);
 
         Utils.writeObject(HEAD, initialCommit);
@@ -112,7 +112,7 @@ public class Repository {
 
         Commit curentCommit = new Commit(message, HEAD, stage);
 
-        Utils.writeObject(join(Commit.COMMIT_DIR, Utils.sha1(Objects.toString(curentCommit.getParentCommit()), curentCommit.getMessage(), curentCommit.getTimestamp().toString())), curentCommit);
+        Utils.writeObject(join(Commit.COMMIT_DIR, curentCommit.getHashCode()), curentCommit);
         stage.getStageForAddition().clear();
 
         Utils.writeObject(Stage.INDEX, stage);
@@ -163,5 +163,34 @@ public class Repository {
             System.out.println("File does not exist in that commit.");
             System.exit(0);
         }
+    }
+
+    public static void logCommand() {
+        StringBuilder logInfo = new StringBuilder();
+        Commit currentCommit = Utils.readObject(HEAD, Commit.class);
+        String lineSeparator = System.lineSeparator();
+
+        for (; currentCommit.getFirstParentCommit() != null; currentCommit = Utils.readObject(join(Commit.COMMIT_DIR, currentCommit.getFirstParentCommit()), Commit.class)) {
+            Formatter formatter = new Formatter();
+            formatter.format("===" + lineSeparator);
+            formatter.format("commit %s" + lineSeparator, currentCommit.getHashCode());
+            // Date: Thu Nov 9 20:00:05 2017 -0800
+            formatter.format("Date: %ta %tb %te %tT %tY %tz" + lineSeparator, currentCommit.getTimestamp(),currentCommit.getTimestamp(), currentCommit.getTimestamp(),currentCommit.getTimestamp(), currentCommit.getTimestamp(), currentCommit.getTimestamp());
+            formatter.format(currentCommit.getMessage() + lineSeparator);
+            formatter.format(lineSeparator);
+
+            logInfo.append(formatter.toString());
+        }
+
+        Formatter formatter = new Formatter();
+        formatter.format("===" + lineSeparator);
+        formatter.format("commit %s" + lineSeparator, currentCommit.getHashCode());
+        formatter.format("Date: %ta %tb %te %tT %tY %tz" + lineSeparator, currentCommit.getTimestamp(),currentCommit.getTimestamp(), currentCommit.getTimestamp(),currentCommit.getTimestamp(), currentCommit.getTimestamp(), currentCommit.getTimestamp());
+        formatter.format(currentCommit.getMessage() + lineSeparator);
+        formatter.format(lineSeparator);
+
+        logInfo.append(formatter.toString());
+
+        System.out.print(logInfo.toString());
     }
 }

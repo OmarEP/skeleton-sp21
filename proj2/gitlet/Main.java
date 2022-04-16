@@ -31,9 +31,11 @@ public class Main {
                 } else if (args.length == 3) {
                     Repository.checkoutCommand(args[2]);
                 } else  {
-                    Repository.checkoutCommand(args[2], args[3]);
+                    Repository.checkoutCommand(args[1], args[3]);
                 }
-
+                break;
+            case "log":
+                Repository.logCommand();
                 break;
         }
     }

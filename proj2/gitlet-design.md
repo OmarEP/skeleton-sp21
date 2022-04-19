@@ -12,7 +12,7 @@
 2. Blob Folder: in order to keep track of all the blobs(file info)
 3. Branches folder to hold the MASTER branch and any subsequent branches.
 4. Text file with the SHA1 of the HEAD pointer: A way to remember the current HEAD pointer
-
+5. A file that has the name of the current branch name.
 ### Stage
 
 #### Fields
@@ -50,4 +50,4 @@
 1. For the staging area: An "index" text file is created after the first "gitlet add". The "index" text file will have the "stage class" serialized/saved inside it.
 2. Blobs will be stored inside a directory. Each blob will be linked their respective filename at the moment they are "added" inside the staging area.
 3. Commits will be stored inside a directory. Each commit will have the SHA1 of their respective blobs inside a treemap.
-
+4. 

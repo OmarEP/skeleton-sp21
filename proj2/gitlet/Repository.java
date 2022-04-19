@@ -47,6 +47,9 @@ public class Repository {
     public static void initCommand() {
         if (!GITLET_DIR.exists()) {
             GITLET_DIR.mkdir();
+        } else {
+            System.out.println("A Gitlet version-control system already exists in the current directory.");
+            System.exit(0);
         }
 
         if (!Commit.COMMIT_DIR.exists()) {
@@ -192,5 +195,17 @@ public class Repository {
         logInfo.append(formatter.toString());
 
         System.out.print(logInfo.toString());
+    }
+
+    public static void rmCommand(String filename) {
+        stage = Utils.readObject(Stage.INDEX, Stage.class);
+
+        stage.remove(filename);
+
+        Utils.writeObject(Stage.INDEX, stage);
+    }
+
+    public static void globalLogCommand() {
+
     }
 }

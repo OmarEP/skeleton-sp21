@@ -12,14 +12,14 @@ public class Stage implements Serializable {
     private TreeMap<String, String> stageForAddition;
 
     // TreeMap for removal for addition area
-    private TreeMap<String, String> stageForRemoval;
+    private TreeMap<String, File> stageForRemoval;
 
     // File to keep track of all the serialized objects in the staging area
     public final static File INDEX = join(Repository.GITLET_DIR, "INDEX");
 
     public Stage() {
         stageForAddition = new TreeMap<String, String>();
-        stageForRemoval = new TreeMap<String, String>();
+        stageForRemoval = new TreeMap<String, File>();
     }
 
     public void add(String filename, File HEAD) {
@@ -32,7 +32,7 @@ public class Stage implements Serializable {
         // Blob treemap from head commit
         TreeMap<String, String> headCommitBlobTreeMap = headCommit.getBlobTreeMap();
 
-        // If the current stageForAddition treemap contains the filename as a key, then we replace it with the previous
+        // If the current stageForAddition treemap contains the filename as a key, then we replace the previous
         // blob with the new one.
         if (stageForAddition.containsKey(filename) && headCommitBlobTreeMap != null && !headCommitBlobTreeMap.containsKey(filename)) {
             Utils.writeObject(join(Blob.BLOB_DIR, blob.getHashCode()), blob);
@@ -69,8 +69,21 @@ public class Stage implements Serializable {
     }
 
     public void remove(String filename) {
+        Commit headCommit = Utils.readObject(Repository.HEAD, Commit.class);
 
+        if (this.getStageForAddition() != null && this.getStageForAddition().containsKey(filename)) {
+            this.getStageForAddition().remove(filename);
+        } else if (headCommit.getBlobTreeMap() != null && headCommit.getBlobTreeMap().containsKey(filename)) {
+            this.getStageForRemoval().put(filename, join(Repository.CWD, filename));
+            if (this.getStageForRemoval().get(filename).exists()) {
+                Utils.restrictedDelete(this.getStageForRemoval().get(filename));
+            }
+        } else {
+            System.out.println("No reason to remove the file.");
+        }
     }
 
-
+    public TreeMap<String, File> getStageForRemoval() {
+        return stageForRemoval;
+    }
 }

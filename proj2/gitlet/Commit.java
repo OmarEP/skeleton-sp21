@@ -63,6 +63,13 @@ public class Commit implements Serializable {
             }
         }
 
+        TreeMap<String, File> tempRemovalArea = stagingArea.getStageForRemoval();
+        for (String key : tempRemovalArea.keySet()) {
+            if (blobs.containsKey(key)) {
+                blobs.remove(key);
+            }
+        }
+
         this.message = message;
         this.timestamp = new Date();
         this.firstParentCommit = parentCommit.getHashCode();

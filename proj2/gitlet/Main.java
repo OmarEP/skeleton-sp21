@@ -10,6 +10,10 @@ public class Main {
      */
     public static void main(String[] args) {
         // TODO: what if args is empty?
+        if (args.length == 0) {
+            System.out.println("Please enter a command.");
+            System.exit(0);
+        }
         String firstArg = args[0];
         switch(firstArg) {
             case "init":
@@ -22,6 +26,10 @@ public class Main {
                 break;
             // TODO: FILL THE REST IN
             case "commit":
+                if (args.length == 1 || args[1].isBlank()) {
+                    System.out.println("Please enter a commit message.");
+                    System.exit(0);
+                }
                 Repository.commitCommand(args[1]);
                 break;
             case "checkout":
@@ -36,6 +44,16 @@ public class Main {
                 break;
             case "log":
                 Repository.logCommand();
+                break;
+            case "global-log":
+                Repository.globalLogCommand();
+                break;
+            case "rm":
+                Repository.rmCommand(args[1]);
+                break;
+            default:
+                System.out.println("No command with that name exists.");
+                System.exit(0);
                 break;
         }
     }

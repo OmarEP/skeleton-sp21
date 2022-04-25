@@ -51,6 +51,9 @@ public class Main {
             case "rm":
                 Repository.rmCommand(args[1]);
                 break;
+            case "find":
+                Repository.findCommand(args[1]);
+                break;
             default:
                 System.out.println("No command with that name exists.");
                 System.exit(0);

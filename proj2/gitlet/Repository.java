@@ -227,4 +227,22 @@ public class Repository {
 
         System.out.print(logInfo.toString());
     }
+
+    public static void findCommand(String commitMessage) {
+        StringBuilder logInfo = new StringBuilder();
+        String lineSeparator = System.lineSeparator();
+
+        if (Utils.plainFilenamesIn(Commit.COMMIT_DIR) != null) {
+            for (String file : Utils.plainFilenamesIn(Commit.COMMIT_DIR)) {
+                Commit currentCommit = Utils.readObject(join(Commit.COMMIT_DIR, file), Commit.class);
+
+                Formatter formatter = new Formatter();
+                if (currentCommit.getMessage().equals(commitMessage)) {
+                    formatter.format(currentCommit.getHashCode() + lineSeparator);
+                    logInfo.append(formatter.toString());
+                }
+            }
+        }
+        System.out.print(logInfo.toString());
+    }
 }

@@ -206,6 +206,25 @@ public class Repository {
     }
 
     public static void globalLogCommand() {
+        StringBuilder logInfo = new StringBuilder();
+        String lineSeparator = System.lineSeparator();
 
+        if (Utils.plainFilenamesIn(Commit.COMMIT_DIR) != null) {
+            for (String file : Utils.plainFilenamesIn(Commit.COMMIT_DIR)) {
+                Commit currentCommit = Utils.readObject(join(Commit.COMMIT_DIR, file), Commit.class);
+
+                Formatter formatter = new Formatter();
+                formatter.format("===" + lineSeparator);
+                formatter.format("commit %s" + lineSeparator, currentCommit.getHashCode());
+                // Date: Thu Nov 9 20:00:05 2017 -0800
+                formatter.format("Date: %ta %tb %te %tT %tY %tz" + lineSeparator, currentCommit.getTimestamp(),currentCommit.getTimestamp(), currentCommit.getTimestamp(),currentCommit.getTimestamp(), currentCommit.getTimestamp(), currentCommit.getTimestamp());
+                formatter.format(currentCommit.getMessage() + lineSeparator);
+                formatter.format(lineSeparator);
+
+                logInfo.append(formatter.toString());
+            }
+        }
+
+        System.out.print(logInfo.toString());
     }
 }

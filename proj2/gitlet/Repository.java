@@ -243,6 +243,10 @@ public class Repository {
                 }
             }
         }
+        if (logInfo.length() == 0) {
+            System.out.println("Found no commit with that message.");
+            System.exit(0);
+        }
         System.out.print(logInfo.toString());
     }
 }

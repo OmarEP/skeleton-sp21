@@ -72,7 +72,6 @@ public class Commit implements Serializable {
         this.message = message;
         this.timestamp = new Date();
         this.firstParentCommit = parentCommit.getHashCode();
-
     }
 
     private boolean isSameBlob(String firstBlob, String secondBlob) {

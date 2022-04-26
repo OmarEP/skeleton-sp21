@@ -62,6 +62,9 @@ public class Main {
             case "branch":
                 Repository.branchCommand(args[1]);
                 break;
+            case "rm-branch":
+                Repository.removebranchCommand(args[1]);
+                break;
             default:
                 System.out.println("No command with that name exists.");
                 System.exit(0);

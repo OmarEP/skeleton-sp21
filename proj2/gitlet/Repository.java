@@ -150,7 +150,7 @@ public class Repository {
             System.exit(0);
         // If one of the files in the Working directory isn't tracked
         } else if (Utils.plainFilenamesIn(CWD) != null){
-            Commit currentBranchHeadCommit = Utils.readObject(join(BRANCHES, branchName), Commit.class);
+            Commit currentBranchHeadCommit = Utils.readObject(HEAD, Commit.class);
             for (String file : Utils.plainFilenamesIn(CWD)) {
                 if (!currentBranchHeadCommit.getBlobTreeMap().containsKey(file)) {
                     System.out.println(" There is an untracked file in the way; delete it, or add and commit it first.");
@@ -174,6 +174,8 @@ public class Repository {
                 Utils.writeContents(join(CWD, key), blob.getContent());
             }
         }
+
+        Utils.writeObject(HEAD, currentBranchHeadCommit);
     }
 
     public static void checkoutCommand(String filename, String placeHolder) {
@@ -319,11 +321,9 @@ public class Repository {
                 } else {
                     formatter.format(file + lineSeparator);
                 }
-
-                formatter.format("---" + lineSeparator);
-                formatter.format("---" + lineSeparator);
             }
         }
+        formatter.format(lineSeparator);
         statusInfo.append(formatter.toString());
 
         formatter = new Formatter();
@@ -339,8 +339,7 @@ public class Repository {
             }
         }
         formatter = new Formatter();
-        formatter.format("---" + lineSeparator);
-        formatter.format("---" + lineSeparator);
+        formatter.format(lineSeparator);
 
         statusInfo.append(formatter.toString());
 
@@ -356,8 +355,7 @@ public class Repository {
             }
         }
         formatter = new Formatter();
-        formatter.format("---" + lineSeparator);
-        formatter.format("---" + lineSeparator);
+        formatter.format(lineSeparator);
 
         statusInfo.append(formatter.toString());
 
@@ -372,5 +370,9 @@ public class Repository {
 
         Commit currentCommit = Utils.readObject(HEAD, Commit.class);
         Utils.writeObject(join(BRANCHES, branchName), currentCommit);
+    }
+
+    public static void removebranchCommand(String brancName) {
+
     }
 }

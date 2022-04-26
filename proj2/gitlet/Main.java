@@ -33,13 +33,15 @@ public class Main {
                 Repository.commitCommand(args[1]);
                 break;
             case "checkout":
-                if (args.length < 3 || args.length > 4) {
+                if (args.length < 2 || args.length > 4) {
                     System.out.println("Incorrect operands.");
                     System.exit(0);
+                } else if (args.length == 2) {
+                    Repository.checkoutCommand(args[1]);
                 } else if (args.length == 3) {
-                    Repository.checkoutCommand(args[2]);
+                    Repository.checkoutCommand(args[2], args[1]);
                 } else  {
-                    Repository.checkoutCommand(args[1], args[3]);
+                    Repository.checkoutCommand(args[1], args[3], args[2]);
                 }
                 break;
             case "log":
@@ -56,6 +58,9 @@ public class Main {
                 break;
             case "status":
                 Repository.statusCommand();
+                break;
+            case "branch":
+                Repository.branchCommand(args[1]);
                 break;
             default:
                 System.out.println("No command with that name exists.");

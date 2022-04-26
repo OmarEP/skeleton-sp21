@@ -41,9 +41,6 @@ public class Repository {
     // The current Branch name
     public static final File currentBranchName = join(BRANCHES, "currentBranchName.txt");
 
-    // List of removed files
-    public static final File REMOVED_FILES = join(GITLET_DIR, "removedFiles");
-
     // Stage Repository
     private static Stage stage;
 
@@ -82,10 +79,6 @@ public class Repository {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-        }
-
-        if (!REMOVED_FILES.exists()) {
-            REMOVED_FILES.mkdir();
         }
 
 
@@ -137,6 +130,7 @@ public class Repository {
 
         Utils.writeObject(join(Commit.COMMIT_DIR, curentCommit.getHashCode()), curentCommit);
         stage.getStageForAddition().clear();
+        stage.getStageForRemoval().clear();
 
         Utils.writeObject(Stage.INDEX, stage);
 
@@ -144,7 +138,45 @@ public class Repository {
         Utils.writeObject(join(BRANCHES, Utils.readContentsAsString(currentBranchName)), curentCommit);
     }
 
-    public static void checkoutCommand(String filename) {
+    public static void checkoutCommand(String branchName) {
+
+        // If the branch name doesn't exist
+        if (!join(BRANCHES, branchName).exists()) {
+            System.out.println("No such branch exists.");
+            System.exit(0);
+        // If the branch name has already been created
+        } else if (Utils.readContentsAsString(currentBranchName).equals(branchName)) {
+            System.out.println("No need to checkout the current branch.");
+            System.exit(0);
+        // If one of the files in the Working directory isn't tracked
+        } else if (Utils.plainFilenamesIn(CWD) != null){
+            Commit currentBranchHeadCommit = Utils.readObject(join(BRANCHES, branchName), Commit.class);
+            for (String file : Utils.plainFilenamesIn(CWD)) {
+                if (!currentBranchHeadCommit.getBlobTreeMap().containsKey(file)) {
+                    System.out.println(" There is an untracked file in the way; delete it, or add and commit it first.");
+                    System.exit(0);
+                }
+            }
+        }
+
+        Utils.writeContents(currentBranchName, branchName);
+
+        if (Utils.plainFilenamesIn(CWD) != null){
+            for (String file : Utils.plainFilenamesIn(CWD)) {
+                Utils.restrictedDelete(file);
+            }
+        }
+
+        Commit currentBranchHeadCommit = Utils.readObject(join(BRANCHES, branchName), Commit.class);
+        if (currentBranchHeadCommit.getBlobTreeMap() != null) {
+            for (String key : currentBranchHeadCommit.getBlobTreeMap().keySet()) {
+                Blob blob = Utils.readObject(join(Blob.BLOB_DIR, currentBranchHeadCommit.getBlobTreeMap().get(key)), Blob.class);
+                Utils.writeContents(join(CWD, key), blob.getContent());
+            }
+        }
+    }
+
+    public static void checkoutCommand(String filename, String placeHolder) {
         Commit headCommit = Utils.readObject(HEAD, Commit.class);
 
         if (headCommit.getBlobTreeMap().containsKey(filename)) {
@@ -156,7 +188,7 @@ public class Repository {
         }
     }
 
-    public static void checkoutCommand(String commitId, String filename) {
+    public static void checkoutCommand(String commitId, String filename, String placeHolder) {
         if (commitId.length() < 40 && Utils.plainFilenamesIn(Commit.COMMIT_DIR) != null) {
 
             for (String file : Utils.plainFilenamesIn(Commit.COMMIT_DIR)) {
@@ -299,7 +331,7 @@ public class Repository {
         statusInfo.append(formatter.toString());
 
         Stage tempStage = Utils.readObject(Stage.INDEX, Stage.class);
-        if (tempStage != null) {
+        if (tempStage.getStageForAddition() != null) {
             for (String file : tempStage.getStageForAddition().keySet()) {
                 formatter = new Formatter();
                 formatter.format(file + lineSeparator);
@@ -316,8 +348,8 @@ public class Repository {
         formatter.format("=== Removed Files ===" + lineSeparator);
         statusInfo.append(formatter.toString());
 
-        if (Utils.plainFilenamesIn(REMOVED_FILES) != null) {
-            for (String file : Utils.plainFilenamesIn(REMOVED_FILES)) {
+        if (tempStage.getStageForRemoval() != null) {
+            for (String file : tempStage.getStageForRemoval().keySet()) {
                 formatter = new Formatter();
                 formatter.format(file + lineSeparator);
                 statusInfo.append(formatter.toString());
@@ -330,5 +362,15 @@ public class Repository {
         statusInfo.append(formatter.toString());
 
         System.out.print(statusInfo.toString());
+    }
+
+    public static void branchCommand(String branchName) {
+        if (join(BRANCHES, branchName).exists()) {
+            System.out.println("A branch with that name already exists.");
+            System.exit(0);
+        }
+
+        Commit currentCommit = Utils.readObject(HEAD, Commit.class);
+        Utils.writeObject(join(BRANCHES, branchName), currentCommit);
     }
 }

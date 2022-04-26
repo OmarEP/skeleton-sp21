@@ -372,7 +372,15 @@ public class Repository {
         Utils.writeObject(join(BRANCHES, branchName), currentCommit);
     }
 
-    public static void removebranchCommand(String brancName) {
+    public static void removebranchCommand(String branchName) {
+        if (!join(BRANCHES, branchName).exists()) {
+            System.out.println("A branch with that name does not exist.");
+            System.exit(0);
+        } else if (Utils.readContentsAsString(currentBranchName).equals(branchName)) {
+            System.out.println("Cannot remove the current branch.");
+            System.exit(0);
+        }
 
+        join(BRANCHES, branchName).delete();
     }
 }

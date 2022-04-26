@@ -32,9 +32,12 @@ public class Stage implements Serializable {
         // Blob treemap from head commit
         TreeMap<String, String> headCommitBlobTreeMap = headCommit.getBlobTreeMap();
 
+        if (!stageForAddition.containsKey(filename) && stageForRemoval.containsKey(filename) && headCommitBlobTreeMap != null) {
+            stageForRemoval.remove(filename);
+
         // If the current stageForAddition treemap contains the filename as a key, then we replace the previous
         // blob with the new one.
-        if (stageForAddition.containsKey(filename) && headCommitBlobTreeMap != null && !headCommitBlobTreeMap.containsKey(filename)) {
+        } else if (stageForAddition.containsKey(filename) && headCommitBlobTreeMap != null && !headCommitBlobTreeMap.containsKey(filename)) {
             Utils.writeObject(join(Blob.BLOB_DIR, blob.getHashCode()), blob);
 
             stageForAddition.put(filename, blob.getHashCode());

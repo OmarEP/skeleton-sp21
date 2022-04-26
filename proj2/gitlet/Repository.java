@@ -400,15 +400,15 @@ public class Repository {
     }
 
     public static void resetCommand(String commitId) {
-        if (Utils.plainFilenamesIn(CWD) != null){
-            Commit currentBranchHeadCommit = Utils.readObject(HEAD, Commit.class);
-            for (String file : Utils.plainFilenamesIn(CWD)) {
-                if (!currentBranchHeadCommit.getBlobTreeMap().containsKey(file)) {
-                    System.out.println("There is an untracked file in the way; delete it, or add and commit it first.");
-                    System.exit(0);
-                }
-            }
-        }
+//        if (Utils.plainFilenamesIn(CWD) != null){
+//            Commit currentBranchHeadCommit = Utils.readObject(HEAD, Commit.class);
+//            for (String file : Utils.plainFilenamesIn(CWD)) {
+//                if (!currentBranchHeadCommit.getBlobTreeMap().containsKey(file)) {
+//                    System.out.println("There is an untracked file in the way; delete it, or add and commit it first.");
+//                    System.exit(0);
+//                }
+//            }
+//        }
 
         if (commitId.length() < 40 && Utils.plainFilenamesIn(Commit.COMMIT_DIR) != null) {
 

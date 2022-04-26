@@ -153,7 +153,7 @@ public class Repository {
             Commit currentBranchHeadCommit = Utils.readObject(HEAD, Commit.class);
             for (String file : Utils.plainFilenamesIn(CWD)) {
                 if (!currentBranchHeadCommit.getBlobTreeMap().containsKey(file)) {
-                    System.out.println(" There is an untracked file in the way; delete it, or add and commit it first.");
+                    System.out.println("There is an untracked file in the way; delete it, or add and commit it first.");
                     System.exit(0);
                 }
             }
@@ -359,6 +359,21 @@ public class Repository {
 
         statusInfo.append(formatter.toString());
 
+        formatter = new Formatter();
+        formatter.format("=== Modifications Not Staged For Commit ===" + lineSeparator);
+        statusInfo.append(formatter.toString());
+
+        formatter = new Formatter();
+        formatter.format(lineSeparator);
+
+        statusInfo.append(formatter.toString());
+
+        formatter = new Formatter();
+        formatter.format("=== Untracked Files ===" + lineSeparator);
+        statusInfo.append(formatter.toString());
+
+        statusInfo.append("\n");
+
         System.out.print(statusInfo.toString());
     }
 
@@ -382,5 +397,75 @@ public class Repository {
         }
 
         join(BRANCHES, branchName).delete();
+    }
+
+    public static void resetCommand(String commitId) {
+        if (Utils.plainFilenamesIn(CWD) != null){
+            Commit currentBranchHeadCommit = Utils.readObject(HEAD, Commit.class);
+            for (String file : Utils.plainFilenamesIn(CWD)) {
+                if (!currentBranchHeadCommit.getBlobTreeMap().containsKey(file)) {
+                    System.out.println("There is an untracked file in the way; delete it, or add and commit it first.");
+                    System.exit(0);
+                }
+            }
+        }
+
+        if (commitId.length() < 40 && Utils.plainFilenamesIn(Commit.COMMIT_DIR) != null) {
+
+            for (String commit : Utils.plainFilenamesIn(Commit.COMMIT_DIR)) {
+                if (commit.startsWith(commitId)) {
+                    Commit currentCommit = Utils.readObject(join(Commit.COMMIT_DIR, commit), Commit.class);
+
+                    if (Utils.plainFilenamesIn(CWD) != null){
+                        for (String file : Utils.plainFilenamesIn(CWD)) {
+                            Utils.restrictedDelete(file);
+                        }
+                    }
+
+                    if (currentCommit.getBlobTreeMap() != null) {
+                        for (String key : currentCommit.getBlobTreeMap().keySet()) {
+                            Blob blob = Utils.readObject(join(Blob.BLOB_DIR, currentCommit.getBlobTreeMap().get(key)), Blob.class);
+                            Utils.writeContents(join(CWD, key), blob.getContent());
+                        }
+                    }
+                    stage = Utils.readObject(Stage.INDEX, Stage.class);
+                    stage.getStageForAddition().clear();
+                    stage.getStageForRemoval().clear();
+
+                    Utils.writeObject(Stage.INDEX, stage);
+
+                    Utils.writeObject(join(BRANCHES, Utils.readContentsAsString(currentBranchName)), currentCommit);
+                    Utils.writeObject(HEAD, currentCommit);
+                    System.exit(0);
+                }
+            }
+        } else if (Utils.join(Commit.COMMIT_DIR, commitId).exists()) {
+            Commit currentCommit = Utils.readObject(join(Commit.COMMIT_DIR, commitId), Commit.class);
+
+            if (Utils.plainFilenamesIn(CWD) != null){
+                for (String file : Utils.plainFilenamesIn(CWD)) {
+                    Utils.restrictedDelete(file);
+                }
+            }
+
+            if (currentCommit.getBlobTreeMap() != null) {
+                for (String key : currentCommit.getBlobTreeMap().keySet()) {
+                    Blob blob = Utils.readObject(join(Blob.BLOB_DIR, currentCommit.getBlobTreeMap().get(key)), Blob.class);
+                    Utils.writeContents(join(CWD, key), blob.getContent());
+                }
+            }
+
+            stage = Utils.readObject(Stage.INDEX, Stage.class);
+            stage.getStageForAddition().clear();
+            stage.getStageForRemoval().clear();
+
+            Utils.writeObject(Stage.INDEX, stage);
+
+            Utils.writeObject(join(BRANCHES, Utils.readContentsAsString(currentBranchName)), currentCommit);
+            Utils.writeObject(HEAD, currentCommit);
+        } else {
+            System.out.println("No commit with that id exists.");
+            System.exit(0);
+        }
     }
 }

@@ -1,6 +1,7 @@
 package gitlet;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.TreeMap;
 
@@ -70,11 +71,21 @@ public class Stage implements Serializable {
 
     public void remove(String filename) {
         Commit headCommit = Utils.readObject(Repository.HEAD, Commit.class);
+        StringBuilder listRemovedFiles = new StringBuilder();
 
         if (this.getStageForAddition() != null && this.getStageForAddition().containsKey(filename)) {
             this.getStageForAddition().remove(filename);
         } else if (headCommit.getBlobTreeMap() != null && headCommit.getBlobTreeMap().containsKey(filename)) {
             this.getStageForRemoval().put(filename, join(Repository.CWD, filename));
+
+            if(!Utils.join(Repository.REMOVED_FILES, filename).exists()) {
+                try {
+                    Utils.join(Repository.REMOVED_FILES, filename).createNewFile();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+
             if (this.getStageForRemoval().get(filename).exists()) {
                 Utils.restrictedDelete(this.getStageForRemoval().get(filename));
             }

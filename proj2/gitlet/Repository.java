@@ -41,6 +41,9 @@ public class Repository {
     // The current Branch name
     public static final File currentBranchName = join(BRANCHES, "currentBranchName.txt");
 
+    // List of removed files
+    public static final File REMOVED_FILES = join(GITLET_DIR, "removedFiles");
+
     // Stage Repository
     private static Stage stage;
 
@@ -79,6 +82,10 @@ public class Repository {
             } catch (IOException e) {
                 e.printStackTrace();
             }
+        }
+
+        if (!REMOVED_FILES.exists()) {
+            REMOVED_FILES.mkdir();
         }
 
 
@@ -264,6 +271,64 @@ public class Repository {
     }
 
     public static void statusCommand() {
+        Formatter formatter = new Formatter();
+        StringBuilder statusInfo = new StringBuilder();
+        String lineSeparator = System.lineSeparator();
 
+        formatter.format("=== Branches ===" + lineSeparator);
+        if (Utils.plainFilenamesIn(BRANCHES) != null) {
+            for (String file : Utils.plainFilenamesIn(BRANCHES)) {
+                if (file.equals("currentBranchName.txt")) {
+                    continue;
+                }
+
+                if (Utils.readContentsAsString(currentBranchName).equals(file)) {
+                    formatter.format("*" + file + lineSeparator);
+                } else {
+                    formatter.format(file + lineSeparator);
+                }
+
+                formatter.format("---" + lineSeparator);
+                formatter.format("---" + lineSeparator);
+            }
+        }
+        statusInfo.append(formatter.toString());
+
+        formatter = new Formatter();
+        formatter.format("=== Staged Files ===" + lineSeparator);
+        statusInfo.append(formatter.toString());
+
+        Stage tempStage = Utils.readObject(Stage.INDEX, Stage.class);
+        if (tempStage != null) {
+            for (String file : tempStage.getStageForAddition().keySet()) {
+                formatter = new Formatter();
+                formatter.format(file + lineSeparator);
+                statusInfo.append(formatter.toString());
+            }
+        }
+        formatter = new Formatter();
+        formatter.format("---" + lineSeparator);
+        formatter.format("---" + lineSeparator);
+
+        statusInfo.append(formatter.toString());
+
+        formatter = new Formatter();
+        formatter.format("=== Removed Files ===" + lineSeparator);
+        statusInfo.append(formatter.toString());
+
+        if (Utils.plainFilenamesIn(REMOVED_FILES) != null) {
+            for (String file : Utils.plainFilenamesIn(REMOVED_FILES)) {
+                formatter = new Formatter();
+                formatter.format(file + lineSeparator);
+                statusInfo.append(formatter.toString());
+            }
+        }
+        formatter = new Formatter();
+        formatter.format("---" + lineSeparator);
+        formatter.format("---" + lineSeparator);
+
+        statusInfo.append(formatter.toString());
+
+        System.out.print(statusInfo.toString());
     }
 }

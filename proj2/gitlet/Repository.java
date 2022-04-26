@@ -38,12 +38,13 @@ public class Repository {
     // The HEAD pointer
     public static final File HEAD = join(GITLET_DIR, "HEAD");
 
+    // The current Branch name
+    public static final File currentBranchName = join(BRANCHES, "currentBranchName.txt");
+
     // Stage Repository
     private static Stage stage;
 
 
-
-    /* TODO: fill in the rest of this class. */
     public static void initCommand() {
         if (!GITLET_DIR.exists()) {
             GITLET_DIR.mkdir();
@@ -72,6 +73,15 @@ public class Repository {
             }
         }
 
+        if (!currentBranchName.exists()) {
+            try {
+                currentBranchName.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+
         if (!HEAD.exists()) {
             try {
                 HEAD.createNewFile();
@@ -97,7 +107,10 @@ public class Repository {
         Utils.writeObject(initialCommitFile, initialCommit);
 
         Utils.writeObject(HEAD, initialCommit);
-        Utils.writeObject(MASTER, initialCommit);
+
+
+        Utils.writeContents(currentBranchName, MASTER.getName());
+        Utils.writeObject(join(BRANCHES, Utils.readContentsAsString(currentBranchName)), initialCommit);
     }
 
 
@@ -121,7 +134,7 @@ public class Repository {
         Utils.writeObject(Stage.INDEX, stage);
 
         Utils.writeObject(HEAD, curentCommit);
-        Utils.writeObject(MASTER, curentCommit);
+        Utils.writeObject(join(BRANCHES, Utils.readContentsAsString(currentBranchName)), curentCommit);
     }
 
     public static void checkoutCommand(String filename) {
@@ -248,5 +261,9 @@ public class Repository {
             System.exit(0);
         }
         System.out.print(logInfo.toString());
+    }
+
+    public static void statusCommand() {
+
     }
 }

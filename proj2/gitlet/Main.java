@@ -39,9 +39,17 @@ public class Main {
                 } else if (args.length == 2) {
                     Repository.checkoutCommand(args[1]);
                 } else if (args.length == 3) {
+                    if (!args[1].equals("--")) {
+                        System.out.println("Incorrect operands.");
+                        System.exit(0);
+                    }
                     Repository.checkoutCommand(args[2], args[1]);
                 } else  {
                     Repository.checkoutCommand(args[1], args[3], args[2]);
+                    if (!args[2].equals("--")) {
+                        System.out.println("Incorrect operands.");
+                        System.exit(0);
+                    }
                 }
                 break;
             case "log":

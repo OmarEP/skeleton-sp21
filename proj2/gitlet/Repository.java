@@ -207,15 +207,18 @@ public class Repository {
                 }
             }
         } else if (Utils.join(Commit.COMMIT_DIR, commitId).exists()) {
-                Commit currentCommit = Utils.readObject(join(Commit.COMMIT_DIR, commitId), Commit.class);
+            Commit currentCommit = Utils.readObject(join(Commit.COMMIT_DIR, commitId), Commit.class);
 
-                if (currentCommit.getBlobTreeMap().containsKey(filename)) {
-                    Blob blob = Utils.readObject(join(Blob.BLOB_DIR, currentCommit.getBlobTreeMap().get(filename)), Blob.class);
-                    Utils.writeContents(join(CWD, filename), blob.getContent());
-                } else {
-                    System.out.println("File does not exist in that commit.");
-                    System.exit(0);
-                }
+            if (currentCommit.getBlobTreeMap().containsKey(filename)) {
+                Blob blob = Utils.readObject(join(Blob.BLOB_DIR, currentCommit.getBlobTreeMap().get(filename)), Blob.class);
+                Utils.writeContents(join(CWD, filename), blob.getContent());
+            } else {
+                System.out.println("File does not exist in that commit.");
+                System.exit(0);
+            }
+        } else if (!Utils.join(Commit.COMMIT_DIR, commitId).exists()) {
+            System.out.println("No commit with that id exists.");
+            System.exit(0);
         } else {
             System.out.println("File does not exist in that commit.");
             System.exit(0);
@@ -400,15 +403,15 @@ public class Repository {
     }
 
     public static void resetCommand(String commitId) {
-//        if (Utils.plainFilenamesIn(CWD) != null){
-//            Commit currentBranchHeadCommit = Utils.readObject(HEAD, Commit.class);
-//            for (String file : Utils.plainFilenamesIn(CWD)) {
-//                if (!currentBranchHeadCommit.getBlobTreeMap().containsKey(file)) {
-//                    System.out.println("There is an untracked file in the way; delete it, or add and commit it first.");
-//                    System.exit(0);
-//                }
-//            }
-//        }
+        if (Utils.plainFilenamesIn(CWD) != null){
+            Commit currentBranchHeadCommit = Utils.readObject(HEAD, Commit.class);
+            for (String file : Utils.plainFilenamesIn(CWD)) {
+                if (!currentBranchHeadCommit.getBlobTreeMap().containsKey(file)) {
+                    System.out.println("There is an untracked file in the way; delete it, or add and commit it first.");
+                    System.exit(0);
+                }
+            }
+        }
 
         if (commitId.length() < 40 && Utils.plainFilenamesIn(Commit.COMMIT_DIR) != null) {
 

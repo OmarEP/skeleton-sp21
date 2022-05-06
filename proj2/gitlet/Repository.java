@@ -2,7 +2,8 @@ package gitlet;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Formatter;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import static gitlet.Utils.join;
 
@@ -39,7 +40,7 @@ public class Repository {
     public static final File HEAD = join(GITLET_DIR, "HEAD");
 
     // The current Branch name
-    public static final File currentBranchName = join(BRANCHES, "currentBranchName.txt");
+    public static final File CURRENT_BRANCH_NAME = join(BRANCHES, "currentBranchName.txt");
 
     // Stage Repository
     private static Stage stage;
@@ -73,9 +74,9 @@ public class Repository {
             }
         }
 
-        if (!currentBranchName.exists()) {
+        if (!CURRENT_BRANCH_NAME.exists()) {
             try {
-                currentBranchName.createNewFile();
+                CURRENT_BRANCH_NAME.createNewFile();
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -109,8 +110,8 @@ public class Repository {
         Utils.writeObject(HEAD, initialCommit);
 
 
-        Utils.writeContents(currentBranchName, MASTER.getName());
-        Utils.writeObject(join(BRANCHES, Utils.readContentsAsString(currentBranchName)), initialCommit);
+        Utils.writeContents(CURRENT_BRANCH_NAME, MASTER.getName());
+        Utils.writeObject(join(BRANCHES, Utils.readContentsAsString(CURRENT_BRANCH_NAME)), initialCommit);
     }
 
 
@@ -135,7 +136,7 @@ public class Repository {
         Utils.writeObject(Stage.INDEX, stage);
 
         Utils.writeObject(HEAD, curentCommit);
-        Utils.writeObject(join(BRANCHES, Utils.readContentsAsString(currentBranchName)), curentCommit);
+        Utils.writeObject(join(BRANCHES, Utils.readContentsAsString(CURRENT_BRANCH_NAME)), curentCommit);
     }
 
     public static void checkoutCommand(String branchName) {
@@ -145,7 +146,7 @@ public class Repository {
             System.out.println("No such branch exists.");
             System.exit(0);
         // If the branch name has already been created
-        } else if (Utils.readContentsAsString(currentBranchName).equals(branchName)) {
+        } else if (Utils.readContentsAsString(CURRENT_BRANCH_NAME).equals(branchName)) {
             System.out.println("No need to checkout the current branch.");
             System.exit(0);
         // If one of the files in the Working directory isn't tracked
@@ -159,7 +160,7 @@ public class Repository {
             }
         }
 
-        Utils.writeContents(currentBranchName, branchName);
+        Utils.writeContents(CURRENT_BRANCH_NAME, branchName);
 
         if (Utils.plainFilenamesIn(CWD) != null){
             for (String file : Utils.plainFilenamesIn(CWD)) {
@@ -315,11 +316,11 @@ public class Repository {
         formatter.format("=== Branches ===" + lineSeparator);
         if (Utils.plainFilenamesIn(BRANCHES) != null) {
             for (String file : Utils.plainFilenamesIn(BRANCHES)) {
-                if (file.equals("currentBranchName.txt")) {
+                if (file.equals("CURRENT_BRANCH_NAME.txt")) {
                     continue;
                 }
 
-                if (Utils.readContentsAsString(currentBranchName).equals(file)) {
+                if (Utils.readContentsAsString(CURRENT_BRANCH_NAME).equals(file)) {
                     formatter.format("*" + file + lineSeparator);
                 } else {
                     formatter.format(file + lineSeparator);
@@ -394,7 +395,7 @@ public class Repository {
         if (!join(BRANCHES, branchName).exists()) {
             System.out.println("A branch with that name does not exist.");
             System.exit(0);
-        } else if (Utils.readContentsAsString(currentBranchName).equals(branchName)) {
+        } else if (Utils.readContentsAsString(CURRENT_BRANCH_NAME).equals(branchName)) {
             System.out.println("Cannot remove the current branch.");
             System.exit(0);
         }
@@ -436,7 +437,7 @@ public class Repository {
 
                     Utils.writeObject(Stage.INDEX, stage);
 
-                    Utils.writeObject(join(BRANCHES, Utils.readContentsAsString(currentBranchName)), resetCommit);
+                    Utils.writeObject(join(BRANCHES, Utils.readContentsAsString(CURRENT_BRANCH_NAME)), resetCommit);
                     Utils.writeObject(HEAD, resetCommit);
                     System.exit(0);
                 }
@@ -470,10 +471,54 @@ public class Repository {
 
             Utils.writeObject(Stage.INDEX, stage);
 
-            Utils.writeObject(join(BRANCHES, Utils.readContentsAsString(currentBranchName)), resetCommit);
+            Utils.writeObject(join(BRANCHES, Utils.readContentsAsString(CURRENT_BRANCH_NAME)), resetCommit);
             Utils.writeObject(HEAD, resetCommit);
         } else {
             System.out.println("No commit with that id exists.");
+            System.exit(0);
+        }
+    }
+
+    public static void mergeCommand(String branchName) {
+        if (!join(BRANCHES, branchName).exists()) {
+            System.out.println("A branch with that name does not exist.");
+            System.exit(0);
+        }
+
+        ArrayList<String> currentBranchAncestorCommitsList = new ArrayList<>();
+        Commit currentBranchCommit = Utils.readObject(join(BRANCHES,Utils.readContentsAsString(CURRENT_BRANCH_NAME)), Commit.class);
+        for (; currentBranchCommit.getFirstParentCommit() != null; currentBranchCommit = Utils.readObject(join(Commit.COMMIT_DIR, currentBranchCommit.getFirstParentCommit()), Commit.class)) {
+            currentBranchAncestorCommitsList.add(currentBranchCommit.getFirstParentCommit());
+        }
+        currentBranchAncestorCommitsList.add(currentBranchCommit.getFirstParentCommit());
+
+        ArrayList<String> givenBranchAncestorCommitsList = new ArrayList<>();
+        Commit givenBranchCommit = Utils.readObject(join(BRANCHES,branchName), Commit.class);
+        for (; givenBranchCommit.getFirstParentCommit() != null; givenBranchCommit = Utils.readObject(join(Commit.COMMIT_DIR, givenBranchCommit.getFirstParentCommit()), Commit.class)) {
+            givenBranchAncestorCommitsList.add(givenBranchCommit.getFirstParentCommit());
+        }
+        givenBranchAncestorCommitsList.add(givenBranchCommit.getFirstParentCommit());
+
+        List<String> result = currentBranchAncestorCommitsList.stream()
+                .distinct()
+                .filter(givenBranchAncestorCommitsList::contains)
+                .collect(Collectors.toList());
+
+        ArrayList<Commit> ancestorCommits = new ArrayList<>();
+        for (String current : result) {
+            if (current != null) {
+                ancestorCommits.add(Utils.readObject(join(Commit.COMMIT_DIR, current), Commit.class));
+            }
+        }
+
+        ancestorCommits.sort(new commitComparator().reversed());
+        Commit splitPointCommit = ancestorCommits.get(0);
+        if (givenBranchCommit.getHashCode().equals(splitPointCommit.getHashCode())) {
+            System.out.println("Given branch is an ancestor of the current branch.");
+            System.exit(0);
+        } else if (currentBranchCommit.getHashCode().equals(splitPointCommit.getHashCode())) {
+            checkoutCommand(branchName);
+            System.out.println("Current branch fast-forwarded.");
             System.exit(0);
         }
     }

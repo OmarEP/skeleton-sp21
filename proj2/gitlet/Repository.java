@@ -316,7 +316,7 @@ public class Repository {
         formatter.format("=== Branches ===" + lineSeparator);
         if (Utils.plainFilenamesIn(BRANCHES) != null) {
             for (String file : Utils.plainFilenamesIn(BRANCHES)) {
-                if (file.equals("CURRENT_BRANCH_NAME.txt")) {
+                if (file.equals("currentBranchName.txt")) {
                     continue;
                 }
 
@@ -485,6 +485,35 @@ public class Repository {
             System.exit(0);
         }
 
+        Commit splitPointCommit = findSplitPoint(branchName);
+
+        System.out.println("Split point:" + splitPointCommit.getMessage());
+
+        Set<String> setOfFiles = unionOfFilesBetweenCommits(splitPointCommit, branchName);
+
+        for (String key: setOfFiles) {
+            System.out.println(key);
+        }
+
+        // Loop through the files between the 3 commits(HEAD, OTHER, SPLIT)
+
+        // Modified in OTHER but not HEAD --> OTHER
+
+        // Modified in HEAD but not OTHER --> HEAD
+
+        // Modified in OTHER and HEAD --> In same way --> DNM(same)
+        //                            --> In diff ways --> Conflict
+        
+        // Not in SPLIT nor OTHER but in HEAD --> HEAD
+
+        // Not in SPLIT nor HEAD but in OTHER --> OTHER
+
+        // Unmodified in HEAD but not present in OTHER --> REMOVE
+
+        // Unmodified in OTHER but not present in HEAD --> Remain REMOVED
+    }
+
+    private static Commit findSplitPoint(String branchName) {
         ArrayList<String> currentBranchAncestorCommitsList = new ArrayList<>();
         Commit currentBranchCommit = Utils.readObject(join(BRANCHES,Utils.readContentsAsString(CURRENT_BRANCH_NAME)), Commit.class);
         for (; currentBranchCommit.getFirstParentCommit() != null; currentBranchCommit = Utils.readObject(join(Commit.COMMIT_DIR, currentBranchCommit.getFirstParentCommit()), Commit.class)) {
@@ -521,5 +550,22 @@ public class Repository {
             System.out.println("Current branch fast-forwarded.");
             System.exit(0);
         }
+
+        return splitPointCommit;
+    }
+
+    private static Set<String> unionOfFilesBetweenCommits(Commit splitPointCommit, String branchName) {
+
+        Set<String> setOfFiles = new HashSet<>();
+
+        Commit givenBranchCommit = Utils.readObject(join(BRANCHES,branchName), Commit.class);
+
+        Commit currentBranchCommit = Utils.readObject(join(BRANCHES,Utils.readContentsAsString(CURRENT_BRANCH_NAME)), Commit.class);
+
+        setOfFiles.addAll(splitPointCommit.getBlobTreeMap().keySet());
+        setOfFiles.addAll(givenBranchCommit.getBlobTreeMap().keySet());
+        setOfFiles.addAll(currentBranchCommit.getBlobTreeMap().keySet());
+
+        return setOfFiles;
     }
 }

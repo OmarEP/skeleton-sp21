@@ -117,6 +117,11 @@ public class Repository {
 
 
     public static void addCommand(String filename) {
+        if (!GITLET_DIR.exists()) {
+            System.out.println("Not in an initialized Gitlet directory.\n");
+            System.exit(0);
+        }
+
         stage = Utils.readObject(Stage.INDEX, Stage.class);
 
         stage.add(filename, HEAD);
@@ -125,6 +130,11 @@ public class Repository {
     }
 
     public static void commitCommand(String message) {
+        if (!GITLET_DIR.exists()) {
+            System.out.println("Not in an initialized Gitlet directory.\n");
+            System.exit(0);
+        }
+
         stage = Utils.readObject(Stage.INDEX, Stage.class);
         if (stage.getStageForAddition().isEmpty() && stage.getStageForRemoval().isEmpty()) {
             System.out.println("No changes added to the commit.");
@@ -144,6 +154,11 @@ public class Repository {
     }
 
     public static void commitCommand(String message, Commit secondParentCommit) {
+        if (!GITLET_DIR.exists()) {
+            System.out.println("Not in an initialized Gitlet directory.\n");
+            System.exit(0);
+        }
+
         stage = Utils.readObject(Stage.INDEX, Stage.class);
         if (stage.getStageForAddition().isEmpty() && stage.getStageForRemoval().isEmpty()) {
             System.out.println("No changes added to the commit.");
@@ -166,6 +181,10 @@ public class Repository {
 
 
     public static void checkoutCommand(String branchName) {
+        if (!GITLET_DIR.exists()) {
+            System.out.println("Not in an initialized Gitlet directory.\n");
+            System.exit(0);
+        }
 
         // If the branch name doesn't exist
         if (!join(BRANCHES, branchName).exists()) {
@@ -206,6 +225,11 @@ public class Repository {
     }
 
     public static void checkoutCommand(String filename, String placeHolder) {
+        if (!GITLET_DIR.exists()) {
+            System.out.println("Not in an initialized Gitlet directory.\n");
+            System.exit(0);
+        }
+
         Commit headCommit = Utils.readObject(HEAD, Commit.class);
 
         if (headCommit.getBlobTreeMap().containsKey(filename)) {
@@ -218,6 +242,11 @@ public class Repository {
     }
 
     public static void checkoutCommand(String commitId, String filename, String placeHolder) {
+        if (!GITLET_DIR.exists()) {
+            System.out.println("Not in an initialized Gitlet directory.\n");
+            System.exit(0);
+        }
+
         if (commitId.length() < 40 && Utils.plainFilenamesIn(Commit.COMMIT_DIR) != null) {
 
             for (String file : Utils.plainFilenamesIn(Commit.COMMIT_DIR)) {
@@ -253,6 +282,11 @@ public class Repository {
     }
 
     public static void logCommand() {
+        if (!GITLET_DIR.exists()) {
+            System.out.println("Not in an initialized Gitlet directory.\n");
+            System.exit(0);
+        }
+
         StringBuilder logInfo = new StringBuilder();
         Commit currentCommit = Utils.readObject(HEAD, Commit.class);
         String lineSeparator = System.lineSeparator();
@@ -285,6 +319,11 @@ public class Repository {
     }
 
     public static void rmCommand(String filename) {
+        if (!GITLET_DIR.exists()) {
+            System.out.println("Not in an initialized Gitlet directory.\n");
+            System.exit(0);
+        }
+
         stage = Utils.readObject(Stage.INDEX, Stage.class);
 
         stage.remove(filename);
@@ -293,6 +332,11 @@ public class Repository {
     }
 
     public static void globalLogCommand() {
+        if (!GITLET_DIR.exists()) {
+            System.out.println("Not in an initialized Gitlet directory.\n");
+            System.exit(0);
+        }
+
         StringBuilder logInfo = new StringBuilder();
         String lineSeparator = System.lineSeparator();
 
@@ -316,6 +360,10 @@ public class Repository {
     }
 
     public static void findCommand(String commitMessage) {
+        if (!GITLET_DIR.exists()) {
+            System.out.println("Not in an initialized Gitlet directory.\n");
+            System.exit(0);
+        }
         StringBuilder logInfo = new StringBuilder();
         String lineSeparator = System.lineSeparator();
 
@@ -338,6 +386,10 @@ public class Repository {
     }
 
     public static void statusCommand() {
+        if (!GITLET_DIR.exists()) {
+            System.out.println("Not in an initialized Gitlet directory.\n");
+            System.exit(0);
+        }
         Formatter formatter = new Formatter();
         StringBuilder statusInfo = new StringBuilder();
         String lineSeparator = System.lineSeparator();
@@ -411,6 +463,11 @@ public class Repository {
     }
 
     public static void branchCommand(String branchName) {
+        if (!GITLET_DIR.exists()) {
+            System.out.println("Not in an initialized Gitlet directory.\n");
+            System.exit(0);
+        }
+
         if (join(BRANCHES, branchName).exists()) {
             System.out.println("A branch with that name already exists.");
             System.exit(0);
@@ -421,6 +478,11 @@ public class Repository {
     }
 
     public static void removebranchCommand(String branchName) {
+        if (!GITLET_DIR.exists()) {
+            System.out.println("Not in an initialized Gitlet directory.\n");
+            System.exit(0);
+        }
+
         if (!join(BRANCHES, branchName).exists()) {
             System.out.println("A branch with that name does not exist.");
             System.exit(0);
@@ -433,6 +495,11 @@ public class Repository {
     }
 
     public static void resetCommand(String commitId) {
+        if (!GITLET_DIR.exists()) {
+            System.out.println("Not in an initialized Gitlet directory.\n");
+            System.exit(0);
+        }
+
         Commit currentBranchHeadCommit = Utils.readObject(HEAD, Commit.class);
 
         if (commitId.length() < 40 && Utils.plainFilenamesIn(Commit.COMMIT_DIR) != null) {
@@ -509,6 +576,11 @@ public class Repository {
     }
 
     public static void mergeCommand(String branchName) {
+        if (!GITLET_DIR.exists()) {
+            System.out.println("Not in an initialized Gitlet directory.\n");
+            System.exit(0);
+        }
+
         stage = Utils.readObject(Stage.INDEX, Stage.class);
 
         if (!stage.getStageForAddition().isEmpty() || !stage.getStageForRemoval().isEmpty()) {

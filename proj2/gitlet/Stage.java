@@ -26,17 +26,25 @@ public class Stage implements Serializable {
         // Read the current head commit into an object
         Commit headCommit = Utils.readObject(HEAD, Commit.class);
 
+        // If file doesn't exist in the working directory, exit with an error
+        if (!join(Repository.CWD, filename).exists()) {
+            System.out.println("File does not exist.\n");
+            System.exit(0);
+        }
+
         // Create a blob from the current filename
         Blob blob = new Blob(filename);
 
         // Blob treemap from head commit
         TreeMap<String, String> headCommitBlobTreeMap = headCommit.getBlobTreeMap();
 
-        if (!stageForAddition.containsKey(filename) && stageForRemoval.containsKey(filename) && headCommitBlobTreeMap != null) {
+         if (!stageForAddition.containsKey(filename) && stageForRemoval.containsKey(filename) && headCommitBlobTreeMap != null) {
             stageForRemoval.remove(filename);
 
         // If the current stageForAddition treemap contains the filename as a key, then we replace the previous
         // blob with the new one.
+        } else if (headCommit.getBlobTreeMap().containsKey(filename) && headCommit.getBlobTreeMap().get(filename).equals(blob.getHashCode())) {
+            return;
         } else if (stageForAddition.containsKey(filename) && headCommitBlobTreeMap != null && !headCommitBlobTreeMap.containsKey(filename)) {
             Utils.writeObject(join(Blob.BLOB_DIR, blob.getHashCode()), blob);
 

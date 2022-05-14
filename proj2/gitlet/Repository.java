@@ -5,7 +5,7 @@ import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static gitlet.Utils.join;
+import static gitlet.Utils.*;
 
 // TODO: any imports you need here
 
@@ -126,6 +126,10 @@ public class Repository {
 
     public static void commitCommand(String message) {
         stage = Utils.readObject(Stage.INDEX, Stage.class);
+        if (stage.getStageForAddition().isEmpty() && stage.getStageForRemoval().isEmpty()) {
+            System.out.println("No changes added to the commit.");
+            System.exit(0);
+        }
 
         Commit curentCommit = new Commit(message, HEAD, stage);
 
@@ -138,6 +142,28 @@ public class Repository {
         Utils.writeObject(HEAD, curentCommit);
         Utils.writeObject(join(BRANCHES, Utils.readContentsAsString(CURRENT_BRANCH_NAME)), curentCommit);
     }
+
+    public static void commitCommand(String message, Commit secondParentCommit) {
+        stage = Utils.readObject(Stage.INDEX, Stage.class);
+        if (stage.getStageForAddition().isEmpty() && stage.getStageForRemoval().isEmpty()) {
+            System.out.println("No changes added to the commit.");
+            System.exit(0);
+        }
+
+        Commit curentCommit = new Commit(message, HEAD, stage);
+
+        curentCommit.setSecondParentCommit(secondParentCommit);
+
+        Utils.writeObject(join(Commit.COMMIT_DIR, curentCommit.getHashCode()), curentCommit);
+        stage.getStageForAddition().clear();
+        stage.getStageForRemoval().clear();
+
+        Utils.writeObject(Stage.INDEX, stage);
+
+        Utils.writeObject(HEAD, curentCommit);
+        Utils.writeObject(join(BRANCHES, Utils.readContentsAsString(CURRENT_BRANCH_NAME)), curentCommit);
+    }
+
 
     public static void checkoutCommand(String branchName) {
 
@@ -235,6 +261,9 @@ public class Repository {
             Formatter formatter = new Formatter();
             formatter.format("===" + lineSeparator);
             formatter.format("commit %s" + lineSeparator, currentCommit.getHashCode());
+            if (currentCommit.getSecondParentCommit() != null) {
+                formatter.format("Merge: %s %s" + lineSeparator, currentCommit.getFirstParentCommit().substring(0, 7), currentCommit.getSecondParentCommit().substring(0, 7));
+            }
             // Date: Thu Nov 9 20:00:05 2017 -0800
             formatter.format("Date: %ta %tb %te %tT %tY %tz" + lineSeparator, currentCommit.getTimestamp(),currentCommit.getTimestamp(), currentCommit.getTimestamp(),currentCommit.getTimestamp(), currentCommit.getTimestamp(), currentCommit.getTimestamp());
             formatter.format(currentCommit.getMessage() + lineSeparator);
@@ -480,54 +509,256 @@ public class Repository {
     }
 
     public static void mergeCommand(String branchName) {
-        if (!join(BRANCHES, branchName).exists()) {
-            System.out.println("A branch with that name does not exist.");
+        stage = Utils.readObject(Stage.INDEX, Stage.class);
+
+        if (!stage.getStageForAddition().isEmpty() || !stage.getStageForRemoval().isEmpty()) {
+            System.out.println("You have uncommitted changes.");
             System.exit(0);
         }
 
-        Commit splitPointCommit = findSplitPoint(branchName);
+        if (!join(BRANCHES, branchName).exists()) {
+            System.out.println("A branch with that name does not exist.");
+            System.exit(0);
+        } else if (branchName.equals(readContentsAsString(CURRENT_BRANCH_NAME))) {
+            System.out.println("Cannot merge a branch with itself.");
+            System.exit(0);
+        }
 
-        System.out.println("Split point:" + splitPointCommit.getMessage());
+        Commit currentBranchCommit = Utils.readObject(join(BRANCHES,Utils.readContentsAsString(CURRENT_BRANCH_NAME)), Commit.class);
+
+        Commit givenBranchCommit = Utils.readObject(join(BRANCHES,branchName), Commit.class);
+
+        Commit splitPointCommit = findSplitPoint(branchName);
 
         Set<String> setOfFiles = unionOfFilesBetweenCommits(splitPointCommit, branchName);
 
-        for (String key: setOfFiles) {
-            System.out.println(key);
+        for (String file : Utils.plainFilenamesIn(CWD)) {
+//            if (!currentBranchCommit.getBlobTreeMap().containsKey(file) && !splitPointCommit.getBlobTreeMap().containsKey(file) && !givenBranchCommit.getBlobTreeMap().containsKey(file)) {
+//                System.out.println("There is an untracked file in the way; delete it, or add and commit it first.");
+//                System.exit(0);
+//            }
+
+            if (currentBranchCommit.getBlobTreeMap().containsKey(file)) {
+                Blob currentBranchBlob = Utils.readObject(join(Blob.BLOB_DIR, currentBranchCommit.getBlobTreeMap().get(file)), Blob.class);
+
+                if (!currentBranchBlob.getHashCode().equals(sha1(Utils.readContentsAsString(join(CWD, file))))) {
+                    System.out.println("There is an untracked file in the way; delete it, or add and commit it first.");
+                    System.exit(0);
+                }
+            } else  {
+                System.out.println("There is an untracked file in the way; delete it, or add and commit it first.");
+                System.exit(0);
+            }
         }
 
         // Loop through the files between the 3 commits(HEAD, OTHER, SPLIT)
+        for (String file : setOfFiles) {
 
-        // Modified in OTHER but not HEAD --> OTHER
+            // Modified in OTHER but not HEAD --> OTHER
+            if (splitPointCommit.getBlobTreeMap().containsKey(file) && currentBranchCommit.getBlobTreeMap().containsKey(file) && splitPointCommit.getBlobTreeMap().get(file).equals(currentBranchCommit.getBlobTreeMap().get(file))
+                    && (givenBranchCommit.getBlobTreeMap().containsKey(file) && !(givenBranchCommit.getBlobTreeMap().get(file).equals(splitPointCommit.getBlobTreeMap().get(file))))) {
+                if (!join(CWD, file).exists()) {
+                    try {
+                        join(CWD, file).createNewFile();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
 
-        // Modified in HEAD but not OTHER --> HEAD
+                checkoutCommand(givenBranchCommit.getHashCode(), file, "--");
+                addCommand(file);
 
-        // Modified in OTHER and HEAD --> In same way --> DNM(same)
-        //                            --> In diff ways --> Conflict
-        
-        // Not in SPLIT nor OTHER but in HEAD --> HEAD
+            // Modified in HEAD but not OTHER --> HEAD
+            } else if(splitPointCommit.getBlobTreeMap().containsKey(file) && givenBranchCommit.getBlobTreeMap().containsKey(file) && splitPointCommit.getBlobTreeMap().get(file).equals(givenBranchCommit.getBlobTreeMap().get(file))
+                    && (currentBranchCommit.getBlobTreeMap().containsKey(file) && !(currentBranchCommit.getBlobTreeMap().get(file).equals(splitPointCommit.getBlobTreeMap().get(file))))) {
+                if (!join(CWD, file).exists()) {
+                    try {
+                        join(CWD, file).createNewFile();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+                checkoutCommand(currentBranchCommit.getHashCode(), file, "--");
 
-        // Not in SPLIT nor HEAD but in OTHER --> OTHER
+            /*
+                Any files that have been modified in both the current and given branch in the same way (i.e., both files now have the same content or were both removed)
+                are left unchanged by the merge. If a file was removed from both the current and given branch, but a file of the same name is present in the working directory,
+                it is left alone and continues to be absent (not tracked nor staged) in the merge.
 
-        // Unmodified in HEAD but not present in OTHER --> REMOVE
+             */
+            } else if (splitPointCommit.getBlobTreeMap().containsKey(file)
+                    && ((currentBranchCommit.getBlobTreeMap().containsKey(file) && givenBranchCommit.getBlobTreeMap().containsKey(file)
+                    && currentBranchCommit.getBlobTreeMap().get(file).equals(givenBranchCommit.getBlobTreeMap().get(file)) && !splitPointCommit.getBlobTreeMap().get(file).equals(currentBranchCommit.getBlobTreeMap().get(file)))
+                    || !currentBranchCommit.getBlobTreeMap().containsKey(file) && !givenBranchCommit.getBlobTreeMap().containsKey(file))) {
+                continue;
 
-        // Unmodified in OTHER but not present in HEAD --> Remain REMOVED
+            // Not in SPLIT nor OTHER but in HEAD --> HEAD
+            } else if (!splitPointCommit.getBlobTreeMap().containsKey(file) && !givenBranchCommit.getBlobTreeMap().containsKey(file) && currentBranchCommit.getBlobTreeMap().containsKey(file)) {
+                checkoutCommand(currentBranchCommit.getHashCode(), file, "--");
+
+            // Not in SPLIT nor HEAD but in OTHER --> OTHER
+            } else if (!splitPointCommit.getBlobTreeMap().containsKey(file) && !currentBranchCommit.getBlobTreeMap().containsKey(file) && givenBranchCommit.getBlobTreeMap().containsKey(file)) {
+                if (!join(CWD, file).exists()) {
+                    try {
+                        join(CWD, file).createNewFile();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+
+                checkoutCommand(givenBranchCommit.getHashCode(), file, "--");
+                addCommand(file);
+
+            // Unmodified in HEAD but not present in OTHER --> REMOVE
+            } else if (splitPointCommit.getBlobTreeMap().containsKey(file) && currentBranchCommit.getBlobTreeMap().containsKey(file) && splitPointCommit.getBlobTreeMap().get(file).equals(currentBranchCommit.getBlobTreeMap().get(file)) &&
+                                        !givenBranchCommit.getBlobTreeMap().containsKey(file)) {
+                rmCommand(file);
+
+            // Unmodified in OTHER but not present in HEAD --> Remain REMOVED
+            } else if (splitPointCommit.getBlobTreeMap().containsKey(file) && givenBranchCommit.getBlobTreeMap().containsKey(file) && splitPointCommit.getBlobTreeMap().get(file).equals(givenBranchCommit.getBlobTreeMap().get(file)) &&
+                    !currentBranchCommit.getBlobTreeMap().containsKey(file)) {
+                continue;
+
+            // Modified in OTHER and HEAD --> In same way --> DNM(same)
+            //                            --> In diff ways --> Conflict
+//          }   else if ( (splitPointCommit.getBlobTreeMap().containsKey(file) && currentBranchCommit.getBlobTreeMap().containsKey(file) && givenBranchCommit.getBlobTreeMap().containsKey(file)
+//                    && !(splitPointCommit.getBlobTreeMap().get(file).equals(currentBranchCommit.getBlobTreeMap().get(file))) && !(splitPointCommit.getBlobTreeMap().get(file).equals(givenBranchCommit.getBlobTreeMap().get(file))))
+//                    || ((splitPointCommit.getBlobTreeMap().containsKey(file)) && ((!currentBranchCommit.getBlobTreeMap().containsKey(file) || !splitPointCommit.getBlobTreeMap().get(file).equals(currentBranchCommit.getBlobTreeMap().get(file)))
+//                    || (!givenBranchCommit.getBlobTreeMap().containsKey(file) || !splitPointCommit.getBlobTreeMap().get(file).equals(givenBranchCommit.getBlobTreeMap().get(file)))))
+//                    || (!splitPointCommit.getBlobTreeMap().containsKey(file) && currentBranchCommit.getBlobTreeMap().containsKey(file) && givenBranchCommit.getBlobTreeMap().containsKey(file)
+//            )           && !currentBranchCommit.getBlobTreeMap().get(file).equals(givenBranchCommit.getBlobTreeMap().get(file))) {
+//                if (currentBranchCommit.getBlobTreeMap().get(file).equals(givenBranchCommit.getBlobTreeMap().get(file))) {
+//                    checkoutCommand(currentBranchCommit.getHashCode(), file, "--");
+//                } else {
+//                    mergeConflict(currentBranchCommit, givenBranchCommit, file);
+//                    addCommand(file);
+//                }
+            } else {
+                mergeConflict(currentBranchCommit, givenBranchCommit, file);
+            }
+
+        }
+        commitCommand("Merged " + branchName + " into " + Utils.readContentsAsString(CURRENT_BRANCH_NAME) + ".", givenBranchCommit);
+    }
+
+    private static void mergeConflict(Commit currentBranchCommit, Commit givenBranchCommit, String fileName) {
+        StringBuilder mergedFileContent = new StringBuilder();
+
+        System.out.println("Encountered a merge conflict.");
+
+        if (currentBranchCommit.getBlobTreeMap().containsKey(fileName) && givenBranchCommit.getBlobTreeMap().containsKey(fileName)
+                && !currentBranchCommit.getBlobTreeMap().get(fileName).equals(givenBranchCommit.getBlobTreeMap().get(fileName))) {
+            if (!join(CWD, fileName).exists()) {
+                try {
+                    join(CWD, fileName).createNewFile();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            Blob currentBranchBlob = Utils.readObject(join(Blob.BLOB_DIR, currentBranchCommit.getBlobTreeMap().get(fileName)), Blob.class);
+            Blob givenBranchBlob = Utils.readObject(join(Blob.BLOB_DIR, givenBranchCommit.getBlobTreeMap().get(fileName)), Blob.class);
+
+//            formatter.format("<<<<<<< HEAD" + lineSeparator);
+//            formatter.format(currentBranchBlob.getContent());
+//            formatter.format("=======" + lineSeparator);
+//            formatter.format(givenBranchBlob.getContent());
+//            formatter.format(">>>>>>>" + lineSeparator);
+            mergedFileContent.append("<<<<<<< HEAD\n");
+            mergedFileContent.append(currentBranchBlob.getContent());
+            mergedFileContent.append("=======\n");
+            mergedFileContent.append(givenBranchBlob.getContent());
+            mergedFileContent.append(">>>>>>>\n");
+            Utils.writeContents(join(CWD, fileName), mergedFileContent.toString());
+            addCommand(fileName);
+        } else if (currentBranchCommit.getBlobTreeMap().containsKey(fileName) && !givenBranchCommit.getBlobTreeMap().containsKey(fileName)) {
+            if (!join(CWD, fileName).exists()) {
+                try {
+                    join(CWD, fileName).createNewFile();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            Blob currentBranchBlob = Utils.readObject(join(Blob.BLOB_DIR, currentBranchCommit.getBlobTreeMap().get(fileName)), Blob.class);
+
+//            formatter.format("<<<<<<< HEAD" + lineSeparator);
+//            formatter.format(currentBranchBlob.getContent());
+//            formatter.format("=======" + lineSeparator);
+//            // formatter.format(lineSeparator);
+//            formatter.format(">>>>>>>");
+//            formatter.format("\n");
+            mergedFileContent.append("<<<<<<< HEAD\n");
+            mergedFileContent.append(currentBranchBlob.getContent());
+            mergedFileContent.append("=======\n");
+            // mergedFileContent.append(givenBranchBlob.getContent());
+            mergedFileContent.append(">>>>>>>\n");
+
+            Utils.writeContents(join(CWD, fileName), mergedFileContent.toString());
+            addCommand(fileName);
+        } else if (!currentBranchCommit.getBlobTreeMap().containsKey(fileName) && givenBranchCommit.getSecondParentCommit().contains(fileName)) {
+            if (!join(CWD, fileName).exists()) {
+                try {
+                    join(CWD, fileName).createNewFile();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            Blob givenBranchBlob = Utils.readObject(join(Blob.BLOB_DIR, givenBranchCommit.getBlobTreeMap().get(fileName)), Blob.class);
+
+//            formatter.format("<<<<<<< HEAD");
+//            formatter.format("\n");
+//            formatter.format("=======" + lineSeparator);
+//            formatter.format(givenBranchBlob.getContent());
+//            formatter.format(">>>>>>>");
+//            formatter.format("\n");
+            mergedFileContent.append("<<<<<<< HEAD\n");
+            // mergedFileContent.append(currentBranchBlob.getContent());
+            mergedFileContent.append("=======\n");
+            mergedFileContent.append(givenBranchBlob.getContent());
+            mergedFileContent.append(">>>>>>>\n");
+
+            Utils.writeContents(join(CWD, fileName), mergedFileContent.toString());
+            addCommand(fileName);
+        } else {
+            if (!join(CWD, fileName).exists()) {
+                try {
+                    join(CWD, fileName).createNewFile();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+//            formatter.format("<<<<<<< HEAD" + lineSeparator);
+//            // formatter.format(lineSeparator);
+//            formatter.format("=======" + lineSeparator);
+//            // formatter.format(lineSeparator);
+//            formatter.format(">>>>>>>");
+//            formatter.format("\n");
+            mergedFileContent.append("<<<<<<< HEAD\n");
+            // mergedFileContent.append(currentBranchBlob.getContent());
+            mergedFileContent.append("=======\n");
+            // mergedFileContent.append(givenBranchBlob.getContent());
+            mergedFileContent.append(">>>>>>>\n");
+            Utils.writeContents(join(CWD, fileName), mergedFileContent.toString());
+            addCommand(fileName);
+        }
     }
 
     private static Commit findSplitPoint(String branchName) {
         ArrayList<String> currentBranchAncestorCommitsList = new ArrayList<>();
         Commit currentBranchCommit = Utils.readObject(join(BRANCHES,Utils.readContentsAsString(CURRENT_BRANCH_NAME)), Commit.class);
         for (; currentBranchCommit.getFirstParentCommit() != null; currentBranchCommit = Utils.readObject(join(Commit.COMMIT_DIR, currentBranchCommit.getFirstParentCommit()), Commit.class)) {
-            currentBranchAncestorCommitsList.add(currentBranchCommit.getFirstParentCommit());
+            currentBranchAncestorCommitsList.add(currentBranchCommit.getHashCode());
         }
-        currentBranchAncestorCommitsList.add(currentBranchCommit.getFirstParentCommit());
+        currentBranchAncestorCommitsList.add(currentBranchCommit.getHashCode());
 
         ArrayList<String> givenBranchAncestorCommitsList = new ArrayList<>();
         Commit givenBranchCommit = Utils.readObject(join(BRANCHES,branchName), Commit.class);
         for (; givenBranchCommit.getFirstParentCommit() != null; givenBranchCommit = Utils.readObject(join(Commit.COMMIT_DIR, givenBranchCommit.getFirstParentCommit()), Commit.class)) {
-            givenBranchAncestorCommitsList.add(givenBranchCommit.getFirstParentCommit());
+            givenBranchAncestorCommitsList.add(givenBranchCommit.getHashCode());
         }
-        givenBranchAncestorCommitsList.add(givenBranchCommit.getFirstParentCommit());
-
+        givenBranchAncestorCommitsList.add(givenBranchCommit.getHashCode());
+        
         List<String> result = currentBranchAncestorCommitsList.stream()
                 .distinct()
                 .filter(givenBranchAncestorCommitsList::contains)
@@ -542,6 +773,10 @@ public class Repository {
 
         ancestorCommits.sort(new commitComparator().reversed());
         Commit splitPointCommit = ancestorCommits.get(0);
+        // splitPointCommit.dump();
+
+        currentBranchCommit = Utils.readObject(join(BRANCHES,Utils.readContentsAsString(CURRENT_BRANCH_NAME)), Commit.class);
+        givenBranchCommit = Utils.readObject(join(BRANCHES,branchName), Commit.class);
         if (givenBranchCommit.getHashCode().equals(splitPointCommit.getHashCode())) {
             System.out.println("Given branch is an ancestor of the current branch.");
             System.exit(0);

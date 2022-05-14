@@ -15,7 +15,7 @@ import static gitlet.Utils.join;
  *
  *  @author TODO
  */
-public class Commit implements Serializable {
+public class Commit implements Serializable , Dumpable{
     /**
      * TODO: add instance variables here.
      *
@@ -98,7 +98,16 @@ public class Commit implements Serializable {
         return blobs;
     }
 
+    public void setSecondParentCommit(Commit secondParentCommit) {
+        this.secondParentCommit = secondParentCommit.getHashCode();
+    }
+
     public String getHashCode() {
         return Utils.sha1(this.getTimestamp().toString(), this.getMessage(), Objects.toString(this.getFirstParentCommit()), Objects.toString(this.secondParentCommit));
     }
+
+    @Override
+    public void dump() {
+        System.out.printf("%s\n", getMessage());
+     }
 }

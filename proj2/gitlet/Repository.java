@@ -752,13 +752,29 @@ public class Repository {
         }
         currentBranchAncestorCommitsList.add(currentBranchCommit.getHashCode());
 
+        currentBranchCommit = Utils.readObject(join(BRANCHES,Utils.readContentsAsString(CURRENT_BRANCH_NAME)), Commit.class);
+        if (currentBranchCommit.getSecondParentCommit() != null) {
+            for (; currentBranchCommit.getSecondParentCommit() != null; currentBranchCommit = Utils.readObject(join(Commit.COMMIT_DIR, currentBranchCommit.getSecondParentCommit()), Commit.class)) {
+                currentBranchAncestorCommitsList.add(currentBranchCommit.getHashCode());
+            }
+            currentBranchAncestorCommitsList.add(currentBranchCommit.getHashCode());
+        }
+
         ArrayList<String> givenBranchAncestorCommitsList = new ArrayList<>();
         Commit givenBranchCommit = Utils.readObject(join(BRANCHES,branchName), Commit.class);
         for (; givenBranchCommit.getFirstParentCommit() != null; givenBranchCommit = Utils.readObject(join(Commit.COMMIT_DIR, givenBranchCommit.getFirstParentCommit()), Commit.class)) {
             givenBranchAncestorCommitsList.add(givenBranchCommit.getHashCode());
         }
         givenBranchAncestorCommitsList.add(givenBranchCommit.getHashCode());
-        
+
+        givenBranchCommit = Utils.readObject(join(BRANCHES,branchName), Commit.class);
+        if (givenBranchCommit.getSecondParentCommit() != null) {
+            for (; givenBranchCommit.getSecondParentCommit() != null; givenBranchCommit = Utils.readObject(join(Commit.COMMIT_DIR, givenBranchCommit.getSecondParentCommit()), Commit.class)) {
+                givenBranchAncestorCommitsList.add(givenBranchCommit.getHashCode());
+            }
+            givenBranchAncestorCommitsList.add(givenBranchCommit.getHashCode());
+        }
+
         List<String> result = currentBranchAncestorCommitsList.stream()
                 .distinct()
                 .filter(givenBranchAncestorCommitsList::contains)
